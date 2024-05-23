@@ -1,0 +1,13 @@
+#longtitle,#shorttitle{
+    display: block;
+}
+@media screen and (min-width:426px) {
+    #shorttitle{
+        display: none;
+    }
+}
+@media screen and (max-width:425px) {
+    #longtitle{
+       display: none;
+    }
+}
