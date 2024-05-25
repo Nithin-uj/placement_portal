@@ -283,7 +283,7 @@ function Registration() {
                         error={!!errors.usn}
                         helperText={errors.usn}
                         value={formdata.usn}
-                        // required
+                        required
                         onChange={handleInputChange}                        
                       />
                     </div>
@@ -296,7 +296,7 @@ function Registration() {
                         error={!!errors.email}
                         helperText={errors.email}
                         value={formdata.email}
-                        // required
+                        required
                         onChange={handleInputChange}
                       />
                     </div>
@@ -305,7 +305,6 @@ function Registration() {
                         className="col-3 m-3"
                         variant="contained"
                         type="submit"
-                        // disabled
                       >
                         Next
                       </Button>
@@ -329,7 +328,7 @@ function Registration() {
                         name="fullname"
                         value={formdata.fullname}
                         onChange={handleInputChange}
-                        // required
+                        required
                       />
                     </div>
                     <div className="row mt-2" style={{ padding: "5px" }}>
@@ -340,6 +339,7 @@ function Registration() {
                             format="DD/MM/YYYY"
                             name="dob"
                             value={formdata.dob}
+                            required
                             onChange={handleDateChange}
                           />
                         </DemoContainer>
@@ -353,7 +353,7 @@ function Registration() {
                           value={formdata.gender}
                           name="gender"
                           label="Gender"
-                          // required
+                          required
                           onChange={handleInputChange}
                         >
                           <MenuItem value={"M"}>Male</MenuItem>
@@ -367,6 +367,7 @@ function Registration() {
                         className="col"
                         label="Primary phone no."
                         variant="outlined"
+                        required
                         name="pphno"
                         value={formdata.pphno}
                         error={!!errors.pphno}
@@ -392,6 +393,7 @@ function Registration() {
                         label="Present address"
                         name="presentaddr"
                         multiline
+                        required
                         maxRows={4}
                         value={formdata.presentaddr}
                         error={!!errors.presentaddr}
@@ -406,6 +408,7 @@ function Registration() {
                         label="Permanent address"
                         name="permanentaddr"
                         multiline
+                        required
                         maxRows={4}
                         value={formdata.permanentaddr}
                         error={!!errors.permanentaddr}
@@ -456,6 +459,7 @@ function Registration() {
                         name="bepassingyear"
                         error={!!errors.bepassingyear}
                         helperText={errors.bepassingyear}
+                        required
                         onChange={handleInputChange}
                         variant="outlined"
                       />
@@ -469,7 +473,7 @@ function Registration() {
                         error={!!errors.ccgpa}
                         helperText={errors.ccgpa}
                         value={formdata.ccgpa}
-                        // required
+                        required
                         onChange={handleInputChange}   
                         variant="outlined"
                       />
@@ -576,6 +580,7 @@ function Registration() {
                       <TextField
                         className="col"
                         label="12th passing year"
+                        required
                         variant="outlined"
                         name="twelfthpyear"
                         onChange={handleInputChange}
@@ -589,6 +594,7 @@ function Registration() {
                         className="col"
                         label="12th Percentage"
                         variant="outlined"
+                        required
                         name="twelfthper"
                         onChange={handleInputChange}
                         value={formdata.twelfthper}
@@ -602,6 +608,7 @@ function Registration() {
                       <TextField
                         className="col"
                         label="Diploma passing year"
+                        required
                         variant="outlined"
                         name="diplomapyear"
                         onChange={handleInputChange}
@@ -614,6 +621,7 @@ function Registration() {
                       <TextField
                         className="col"
                         label="Diploma Percentage"
+                        required
                         variant="outlined"
                         name="diplomaper"
                         onChange={handleInputChange}
@@ -627,6 +635,7 @@ function Registration() {
                       <TextField
                         className="col"
                         label="10th passing year"
+                        required
                         variant="outlined"
                         name="tenthpyear"
                         onChange={handleInputChange}
@@ -639,6 +648,7 @@ function Registration() {
                       <TextField
                         className="col"
                         label="10th Percentage"
+                        required
                         variant="outlined"
                         name="tenthper"
                         onChange={handleInputChange}
@@ -700,7 +710,7 @@ function Registration() {
                         // error={!!errors.usn}
                         // helperText={errors.usn}
                         value={password}
-                        // required
+                        required
                         onChange={handlepasswordChange}                        
                       />
                       </div>
@@ -714,7 +724,7 @@ function Registration() {
                         error={!!errors.cpassword}
                         helperText={errors.cpassword}
                         value={formdata.cpassword}
-                        // required
+                        required
                         onChange={handlepasswordChange}                        
                       />
                       </div>
