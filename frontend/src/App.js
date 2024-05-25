@@ -6,6 +6,7 @@ import Home from './Home'
 import Studetlogin from './Studentlogin'
 import Adminlogin from './Adminlogin'
 import Register from './Register.jsx'
+import Main from './Main';
 
 function App() {
 
@@ -16,6 +17,7 @@ function App() {
         <Route path="/register" element={<Register/>}></Route>
         <Route path="/student-login" element={<Studetlogin/>}></Route>
         <Route path="/admin-login" element={<Adminlogin/>}></Route>
+        <Route path="/main" element={<Main/>}></Route>
       </Routes>
     </BrowserRouter>
   );
