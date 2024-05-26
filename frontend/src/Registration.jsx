@@ -209,6 +209,7 @@ function Registration() {
     }
     if(name === "etype"){
       setFormdata({...formdata,etype: value, twelfthpyear : '', twelfthper:'',diplomapyear:'',diplomaper:''});
+      setErrors({...errors,twelfthpyear:"",twelfthper:"",diplomapyear:"",diplomaper:""});
     }
     if(name === "twelfthpyear" || name === "diplomapyear" || name === "tenthpyear"){
       const yearpattern = /^\d{4}$/;
