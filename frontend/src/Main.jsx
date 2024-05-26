@@ -15,6 +15,14 @@ function MyComponent() {
     setFormdata((prevData) => ({ ...prevData, [name]: value }));
   };
 
+  // const date = formdata.dob;
+  // if(typeof date === "object"){
+  //   const year = date['$y'];
+  //   const month = ('0' + (date['$M'] + 1)).slice(-2);
+  //   const day = ('0' + date['$D']).slice(-2);
+  //   setFormdata({...formdata, dob : `${year}-${month}-${day}`})
+  // }
+  
   const handleDateChange = (newValue) => {
     setFormdata((prevData) => ({ ...prevData, dob: newValue }));
   };

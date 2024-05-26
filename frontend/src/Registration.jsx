@@ -11,6 +11,7 @@ import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import Alert from "@mui/material/Alert";
+import Cusalert from "./Alert"
 
 const theme = createTheme({
   palette: {
@@ -24,33 +25,38 @@ const theme = createTheme({
 });
 
 function Registration() {
-  const [step, setStep] = useState(3);
+  const [step, setStep] = useState(1);
   const totalSteps = 4;
+
+  const [alert,setAlert] = useState(false);
+  const [alertmsg,setAlertmsg] = useState("Welcome to NIE Placement Cell");
+  const [alertpath,setAlertpath] = useState("/register");
+
   const [formdata, setFormdata] = useState({
     usn: "",
     email: "",
-    fullname: null,
+    fullname: "",
     dob: null,
-    gender: null,
-    pphno: null,
-    sphno: null,
-    presentaddr: null,
-    permanentaddr: null,
-    bepassingyear: null,
-    ccgpa: null,
-    branch: null,
-    syear: null,
-    ssem: null,
-    section: null,
-    etype : null,
-    twelfthpyear : null,
-    twelfthper : null,
-    diplomapyear : null,
-    diplomaper : null,
-    tenthpyear : null,
-    tenthper : null,
-    backlog : null,
-    cpassword : null
+    gender: "",
+    pphno: "",
+    sphno: "",
+    presentaddr: "",
+    permanentaddr: "",
+    bepassingyear: "",
+    ccgpa: "",
+    branch: "",
+    syear: "",
+    ssem: "",
+    section: "",
+    etype : "",
+    twelfthpyear : "",
+    twelfthper : "",
+    diplomapyear : "",
+    diplomaper : "",
+    tenthpyear : "",
+    tenthper : "",
+    backlog : "",
+    cpassword : ""
   });
 
   const [password,setPassword] = useState('');
@@ -95,10 +101,11 @@ function Registration() {
     if(step===4){
       if(!!!errors.cpassword){
         setHaveerrors(false);
-        alert("Submitted")
+        return true;
       }
       else{
         setHaveerrors(true);
+        return false;
       }
     }
   };
@@ -120,15 +127,25 @@ function Registration() {
   };
   const handelstep4submit = (e) => {
     e.preventDefault();
-    nextStep();
+    if(nextStep()){
+      submitform();
+    }
+    else{
+      console.log("Something went wrong while form filling")
+    }
   };
+
+  const submitform = ()=>{
+    // console.log("Submitting form");
+    setAlert(true);
+    setAlertmsg("Student registered successfully");
+    setAlertpath("/student-login")
+  }
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    // console.log(name,value);
     setFormdata({ ...formdata, [name]: value });
     setHaveerrors(false);
-    // console.table(errors)
 
     if(name === 'usn'){
         const pattern = /^[4][N][I][2][1-4][A-Z]{2}[0-9]{3}$/;
@@ -254,6 +271,7 @@ function Registration() {
 
   return (
     <ThemeProvider theme={theme}>
+      {alert && <Cusalert title="Alert" content={alertmsg} path={alertpath} setAlert={setAlert}/>}
       <div className="container-fluid">
         <div className="row  d-flex align-items-center justify-content-center">
           <div className="col-12 col-xs-4 col-sm-6 col-md-6 col-lg-4">
@@ -751,7 +769,6 @@ function Registration() {
               </div>
             </div>
           </div>
-          {formdata.dob && formdata.dob["%d"]}
         </div>
       </div>
     </ThemeProvider>
