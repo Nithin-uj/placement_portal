@@ -1,1 +1,159 @@
-import express from 'express'
+const express = require('express');
+const mysql = require('mysql2');
+const bcrypt = require('bcryptjs');
+const session = require('express-session');
+const bodyParser = require('body-parser');
+const cors = require('cors');
+
+const app = express();
+const port = 5000;
+
+app.use(bodyParser.json());
+app.use(cors({
+  origin: ['http://localhost:3000','http://192.168.201.100:3000'],
+  credentials: true
+}));
+
+app.use(session({
+  secret: 'your_secret_key',
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: false } // Note: For production, use secure: true
+}));
+
+// MySQL connection
+const db = mysql.createConnection({
+  host: 'localhost',
+  user: 'root',
+  password: 'Nithin@20',
+  database: 'placement_portal'
+});
+
+db.connect(err => {
+  if (err) {
+    console.error('Database connection failed:', err.stack);
+    return;
+  }
+  console.log('Connected to database.');
+});
+
+app.post('/register', (req, res) => {
+  const {formdata,newDate} = req.body;
+//   console.log(formdata)
+//   console.log("newdata "+newDate)
+  const hashedPassword = bcrypt.hashSync(formdata.cpassword, 10);
+//   console.log(hashedPassword);
+if(formdata.diplomapyear === '' || formdata.diplomaper === ''){
+    formdata.diplomapyear = 0;
+    formdata.diplomaper = -1;
+}
+else if(formdata.twelfthpyear === '' || formdata.twelfthper === ''){
+    formdata.twelfthpyear = 0;
+    formdata.twelfthper = -1; 
+}
+const sql = "INSERT INTO Student (usn,email,fullname,dob,gender,pphno,sphno,presentaddr,permanentaddr,bepassingyear,ccgpa,branch,syear,ssem,section,etype,twelfthpyear,twelfthper,diplomapyear,diplomaper,tenthpyear,tenthper,backlog,cpassword) values(?)";
+const value = [formdata.usn,formdata.email,formdata.fullname,newDate,formdata.gender,formdata.pphno,formdata.sphno,formdata.presentaddr,formdata.permanentaddr,formdata.bepassingyear,formdata.ccgpa,formdata.branch,formdata.syear,formdata.ssem,formdata.section,formdata.etype,formdata.twelfthpyear,formdata.twelfthper,formdata.diplomapyear,formdata.diplomaper,formdata.tenthpyear,formdata.tenthper,formdata.backlog,hashedPassword];
+  db.query(sql, [value], (err, result) => {
+    if (err) {
+        if(err.code === "ER_DUP_ENTRY"){
+            return res.status(500).send('USN Already Exist');
+        }
+        return res.status(500).send('Server down failed to register');
+    }
+    res.status(201).send({ message: 'Student Successfully registered' });
+  });
+});
+
+app.post('/adminregister',(req,res)=>{
+  // const data = req.body;
+  // console.log(data.email);
+  // console.log(data.password);
+
+  const hashed = bcrypt.hashSync(req.body.password, 10);
+  const sql = "INSERT INTO Admin (name,email,phno,type,password) values (?)";
+  const value = [req.body.name,req.body.email,req.body.phno,req.body.type,hashed]
+  db.query(sql,[value],(err,result)=>{
+    if(err) return res.status(500).send(err)
+    return res.status(201).send("Admin added")
+  })
+  // res.status(200).send({ message: 'Sent' });
+})
+
+
+app.post('/login', (req, res) => {
+  const { usn, password } = req.body;
+  db.query('SELECT usn,email,cpassword FROM Student WHERE usn = ?', [usn], (err, results) => {
+    if (err) return res.status(500).send('Server error');
+    if (results.length === 0) return res.status(404).send('USN Not Registered');
+
+    const user = results[0];
+    const passwordIsValid = bcrypt.compareSync(password, user.cpassword);
+
+    if (!passwordIsValid) return res.status(401).send('Incorrect password');
+      req.session.user = {
+      usn: user.usn,
+      email: user.email
+    };
+    // console.log(req.session);
+    
+    res.status(200).send({ message: 'Login successful' });
+  });
+});
+
+// Verify User
+app.get('/me', (req, res) => {
+  if (!req.session.user) {
+    return res.status(401).send('Not authenticated');
+  }
+  res.status(200).send(req.session.user);
+});
+
+app.get('/isadmin', (req, res) => {
+  if (!req.session.admin) {
+    return res.status(401).send('Not authenticated');
+  }
+  res.status(200).send(req.session.admin);
+});
+
+// Logout User
+app.post('/logout', (req, res) => {
+  req.session.destroy(err => {
+    if (err) {
+      return res.status(500).send('Could not log out');
+    }
+    res.status(200).send({ message: 'Logout successful' });
+  });
+});
+
+app.post('/adminlogin', (req, res) => {
+  const { email, password } = req.body;
+  db.query('SELECT * FROM Admin WHERE email = ?', [email], (err, results) => {
+    if (err) return res.status(500).send('Server error');
+    if (results.length === 0) return res.status(404).send('Email not found');
+
+    const admin = results[0];
+    const passwordIsValid = bcrypt.compareSync(password, admin.password);
+
+    if (!passwordIsValid) return res.status(401).send('Incorrect password');
+      req.session.admin = {
+      adminname: admin.name,
+      adminemail: admin.email,
+      admintype: admin.type,
+    };
+    // console.log(req.session);
+    
+    res.status(200).send({ message: 'Login successful' });
+  });
+});
+
+app.post('/adminlist',(req,res)=>{
+  db.query("SELECT name,email,type,phno FROM Admin",(err,result)=>{
+    if(err) return res.status(500).send('Server error');
+    res.status(200).send(result);
+  })
+})
+
+
+app.listen(port, () => {
+  console.log(`Server running on port ${port}`);
+});

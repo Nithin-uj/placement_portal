@@ -12,6 +12,7 @@ import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import Alert from "@mui/material/Alert";
 import Cusalert from "./Alert"
+import axios from 'axios'
 
 const theme = createTheme({
   palette: {
@@ -135,12 +136,36 @@ function Registration() {
     }
   };
 
-  const submitform = ()=>{
-    // console.log("Submitting form");
-    setAlert(true);
-    setAlertmsg("Student registered successfully");
-    setAlertpath("/student-login")
-  }
+  const submitform = async ()=>{
+        // console.log("Submitting form");
+
+        const date = formdata.dob;
+        if(typeof date === "object"){
+          const year = date['$y'];
+          const month = ('0' + (date['$M'] + 1)).slice(-2);
+          const day = ('0' + date['$D']).slice(-2);
+          let newDate = "";
+          newDate = `${year}-${month}-${day}`;
+          // console.log("New Date:", newDate);
+            try {
+              const response = await axios.post('http://localhost:5000/register', {formdata,newDate});
+              // console.log(response.data.message);
+              setAlertmsg(response.data.message);
+              setAlertpath("/student-login")
+              setAlert(true);
+            } catch (error) {
+              // console.log(error.response.data);
+              // window.alert(error.response.data);
+              setAlertmsg(error.response.data);
+              setAlertpath("/register")
+              setAlert(true);
+            }
+          }
+            else{
+              setFormdata({...formdata, dob : ""})
+              setStep(2);
+            }
+    }
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -148,6 +173,7 @@ function Registration() {
     setHaveerrors(false);
 
     if(name === 'usn'){
+        setFormdata({ ...formdata, [name]: value.toUpperCase() });
         const pattern = /^[4][N][I][2][1-4][A-Z]{2}[0-9]{3}$/;
         if(!pattern.test(value)){
         setErrors({...errors,usn:"Invalid USN"});
@@ -243,12 +269,16 @@ function Registration() {
     // const day = date["$D"];
     // console.log(year+"-"+month+"-"+day)
     setFormdata({ ...formdata, dob: date });
-    // console.log(date["$d"]);
-    if(date["$d"] == "Invalid Date"){
-      setErrors({...errors,dob:"Invalid Date of birth"});
+    // const datedata = date["$d"];
+    // console.log(date['$d'].toString());
+    // console.log(datedata);
+    if(date['$d'].toString() === "Invalid Date"){
+    // console.log(date['$d'].toString());
+    setErrors({...errors,dob:"Invalid Date of birth"});
     }
     else{
-      setErrors({...errors,dob:""});
+    // console.log(date['$d'].toString()+"222");
+    setErrors({...errors,dob:""});
     }
     // console.table(errors);
   };
@@ -687,8 +717,8 @@ function Registration() {
                           name="backlog"
                           onChange={handleInputChange}
                         >
-                          <MenuItem value={"true"}>Yes</MenuItem>
-                          <MenuItem value={"false"}>No</MenuItem>
+                          <MenuItem value={"1"}>Yes</MenuItem>
+                          <MenuItem value={"0"}>No</MenuItem>
                         </Select>
                       </FormControl>
                     </div>

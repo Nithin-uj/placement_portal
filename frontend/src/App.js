@@ -6,17 +6,21 @@ import Home from './Home'
 import Studetlogin from './Studentlogin'
 import Adminlogin from './Adminlogin'
 import Register from './Register.jsx'
+import Student from './Student.jsx'
+import Admin from './Admin';
 import Main from './Main';
-
+import './custom.scss'; 
 function App() {
 
   return (
     <BrowserRouter>
-      <Routes>
+      <Routes>Student R
         <Route path="/" element={<Home/>}></Route>
         <Route path="/register" element={<Register/>}></Route>
         <Route path="/student-login" element={<Studetlogin/>}></Route>
         <Route path="/admin-login" element={<Adminlogin/>}></Route>
+        <Route path="/student" element={<Student/>}></Route>
+        <Route path="/admin" element={<Admin/>}></Route>
         <Route path="/main" element={<Main/>}></Route>
       </Routes>
     </BrowserRouter>

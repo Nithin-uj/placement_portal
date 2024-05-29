@@ -3,7 +3,7 @@ import React from 'react'
 function Footer() {
   return (
     <div>
-    <div className="card text-light text-bg bg-dark" id="aboutus" >
+    <div className="card text-light text-bg bg-dark rounded-0" id="aboutus" >
     <div className="card-header">About Us</div>
     <div className="card-body">
       <h5 className="card-title">Training and Placement</h5>

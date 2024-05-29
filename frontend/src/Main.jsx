@@ -1,66 +1,50 @@
-import React, { useState } from 'react';
-import { TextField } from '@mui/material';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import React from 'react';
+import Box from '@mui/material/Box';
+import Drawer from '@mui/material/Drawer';
 import Button from '@mui/material/Button';
+import List from '@mui/material/List';
+import Divider from '@mui/material/Divider';
+import ListItem from '@mui/material/ListItem';
+import ListItemButton from '@mui/material/ListItemButton';
+// import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import Studentdashboard from './Components/Studentdashboard';
 
-function MyComponent() {
-  const [formdata, setFormdata] = useState({
-    name: '',
-    email: '',
-    dob: null, // Initialize dob with null
-  });
+export default function TemporaryDrawer() {
+  const [open, setOpen] = React.useState(false);
 
-  const handleInputChange = (event) => {
-    const { name, value } = event.target;
-    setFormdata((prevData) => ({ ...prevData, [name]: value }));
+  const toggleDrawer = (newOpen) => () => {
+    setOpen(newOpen);
   };
 
-  // const date = formdata.dob;
-  // if(typeof date === "object"){
-  //   const year = date['$y'];
-  //   const month = ('0' + (date['$M'] + 1)).slice(-2);
-  //   const day = ('0' + date['$D']).slice(-2);
-  //   setFormdata({...formdata, dob : `${year}-${month}-${day}`})
-  // }
+  const DrawerList = (
+    <Box sx={{ width: 250 }} role="presentation" className="bg-danger" onClick={toggleDrawer(false)}>
+      <List>
+          <ListItem disablePadding>
+            <ListItemButton><ListItemText primary={"text"} /></ListItemButton>
+          </ListItem>
+      </List>
+      <Divider />
+      <List>
+          <ListItem disablePadding>
+            <ListItemButton>
+              <ListItemText primary={"text"} />
+            </ListItemButton>
+          </ListItem>
+      </List>
+    </Box>
+  );
   
-  const handleDateChange = (newValue) => {
-    setFormdata((prevData) => ({ ...prevData, dob: newValue }));
-  };
-
-  const handleFormSubmit = (event) => {
-    event.preventDefault();
-    console.log('Form data:', formdata); // Submit form data (e.g., using API call)
-  };
+  const user = { usn: "4NI21IS068", email: "2021is_shamanthkumarhv_b@nie.ac.in" }
 
   return (
-    <form onSubmit={handleFormSubmit}>
-      <TextField
-        label="Name"
-        name="name"
-        value={formdata.name}
-        onChange={handleInputChange}
-        fullWidth
-        margin="normal"
-      />
-      <TextField
-        label="Email"
-        name="email"
-        value={formdata.email}
-        onChange={handleInputChange}
-        fullWidth
-        margin="normal"
-      />
-      <DatePicker
-        label="Date of Birth"
-        value={formdata.dob}
-        onChange={handleDateChange}
-        renderInput={(params) => <TextField {...params} fullWidth margin="normal" />}
-      />
-      <Button variant="contained" type="submit" fullWidth sx={{ mt: 2 }}>
-        Submit
-      </Button>
-    </form>
+    <div>
+      {/* {window.innerWidth < 768 ?
+      <div><Button onClick={toggleDrawer(true)}>Open drawer</Button> 
+      <Drawer open={open} onClose={toggleDrawer(false)}>
+        {DrawerList}
+      </Drawer></div> : <div>{DrawerList}</div>} */}
+      <Studentdashboard user={user}/>
+    </div>
   );
 }
-
-export default MyComponent;
