@@ -51,6 +51,9 @@ else if(formdata.twelfthpyear === '' || formdata.twelfthper === ''){
     formdata.twelfthpyear = 0;
     formdata.twelfthper = -1; 
 }
+if(formdata.sphno === ''){
+  formdata.sphno = null;
+}
 const sql = "INSERT INTO Student (usn,email,fullname,dob,gender,pphno,sphno,presentaddr,permanentaddr,bepassingyear,ccgpa,branch,syear,ssem,section,etype,twelfthpyear,twelfthper,diplomapyear,diplomaper,tenthpyear,tenthper,backlog,cpassword) values(?)";
 const value = [formdata.usn,formdata.email,formdata.fullname,newDate,formdata.gender,formdata.pphno,formdata.sphno,formdata.presentaddr,formdata.permanentaddr,formdata.bepassingyear,formdata.ccgpa,formdata.branch,formdata.syear,formdata.ssem,formdata.section,formdata.etype,formdata.twelfthpyear,formdata.twelfthper,formdata.diplomapyear,formdata.diplomaper,formdata.tenthpyear,formdata.tenthper,formdata.backlog,hashedPassword];
   db.query(sql, [value], (err, result) => {
@@ -58,6 +61,7 @@ const value = [formdata.usn,formdata.email,formdata.fullname,newDate,formdata.ge
         if(err.code === "ER_DUP_ENTRY"){
             return res.status(500).send('USN Already Exist');
         }
+        // console.log(err);
         return res.status(500).send('Server down failed to register');
     }
     res.status(201).send({ message: 'Student Successfully registered' });
@@ -69,12 +73,12 @@ app.post('/adminregister',(req,res)=>{
   // console.log(data.email);
   // console.log(data.password);
 
-  const hashed = bcrypt.hashSync(req.body.password, 10);
+  const hashed = bcrypt.hashSync(req.body.cpassword, 10);
   const sql = "INSERT INTO Admin (name,email,phno,type,password) values (?)";
   const value = [req.body.name,req.body.email,req.body.phno,req.body.type,hashed]
   db.query(sql,[value],(err,result)=>{
     if(err) return res.status(500).send(err)
-    return res.status(201).send("Admin added")
+    return res.status(201).send("Admin added successfully")
   })
   // res.status(200).send({ message: 'Sent' });
 })
@@ -147,12 +151,86 @@ app.post('/adminlogin', (req, res) => {
 });
 
 app.post('/adminlist',(req,res)=>{
-  db.query("SELECT name,email,type,phno FROM Admin",(err,result)=>{
+  db.query("SELECT name,email,type,phno FROM Admin order by name",(err,result)=>{
     if(err) return res.status(500).send('Server error');
     res.status(200).send(result);
   })
 })
+app.post('/admingetedit',(req,res)=>{
+  db.query(`SELECT name,email,type,phno FROM Admin where email = '${req.body.email}'`,(err,result)=>{
+    if(err) return res.status(500).send('Server error');
+    res.status(200).send(result);
+  })
+})
+app.post('/adminprofileedit',(req,res)=>{
+  // console.log(req.body);
+  const {email,name,phno} = req.body;
+  db.query(`UPDATE Admin SET name = '${name}',phno = ${phno} where email = '${email}'`,(err,result)=>{
+    if(err) return res.status(500).send('Server error');
+    res.status(200).send(result);
+  })
+})
+app.post('/adminemailedit',(req,res)=>{
+  // console.log(req.body);
+  const {oldemail,email} = req.body;
+  db.query(`UPDATE Admin SET email ='${email}' where email = '${oldemail}'`,(err,result)=>{
+    if(err) return res.status(500).send('Server error');
+    res.status(200).send(result);
+  })
+})
+app.post('/adminpasswordedit',(req,res)=>{
+  console.log(req.body);
+  const {email,oldpassword,cpassword} = req.body;
+  db.query(`SELECT password from Admin where email = '${email}'`,(err,result)=>{
+    if(err) return res.status(500).send('Failed to update');
+    else{
+      // console.log(result[0].password);
+      if(bcrypt.compareSync(oldpassword,result[0].password)){
+        const hashed = bcrypt.hashSync(cpassword, 10);
+        db.query(`UPDATE Admin SET password = '${hashed}' where email = '${email}'`,(err2,result2)=>{
+          if(err2){return res.status(500).send('Failed to update')};
+          return res.status(200).send("Password Updated");
+        })
+      }
+      else{
+        return res.status(500).send('Incorrect Current password')
+      }
+    }
+  })
 
+})
+app.post('/adminedit',(req,res)=>{
+  console.log(req.body);
+  const hashed = bcrypt.hashSync(req.body.admindata.cpassword, 10);
+  const {name,email,type,phno} = req.body.admindata;
+  const oldemail = req.body.adminemail;
+  // const sql = "INSERT INTO Admin (name,email,phno,type,password) values (?)";
+  const sql = `UPDATE Admin SET name = '${name}',email='${email}',type='${type}',phno='${phno}',password='${hashed}' where email = '${oldemail}'`
+  // const value = [req.body.name,req.body.email,req.body.phno,req.body.type,hashed]
+  db.query(sql,(err,result)=>{
+    if(err) return res.status(500).send(err);
+    return res.status(201).send("Admin details updated");
+  })
+})
+app.post('/removeadmin',(req,res)=>{
+  db.query(`DELETE from Admin where email = '${req.body.email}'`,(err,result)=>{
+    if(err) return res.status(500).send("err");
+    res.status(200).send("Admin removed");
+  })
+})
+app.post('/getbranchdetails',(req,res)=>{
+  db.query(`select branch,count(USN) as value from Student group by branch`,(err,result)=>{
+    if(err) return res.status(500).send("err");
+    res.status(200).send(result);
+  })
+})
+
+app.post('/getgenderdetails',(req,res)=>{
+  db.query(`select gender,count(USN) as value from Student group by gender`,(err,result)=>{
+    if(err) return res.status(500).send("err");
+    res.status(200).send(result);
+  })
+})
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
