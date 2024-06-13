@@ -4,6 +4,7 @@ import { ButtonGroup,Button } from '@mui/material';
 import {PieChart} from '@mui/x-charts/PieChart';
 import axios from 'axios';
 import TextField from '@mui/material/TextField';
+import { DataGrid } from '@mui/x-data-grid';
 
 export default function Studetntlist() {
   const [suboption,setSuboption] = useState(1);
@@ -296,5 +297,101 @@ const Viewstudent = ()=>{
 }
 
 const Studenttable = ()=>{
-  return <div>Studenttable</div>
+
+    const [studentlist,setStudentlist] = useState([]);
+    const [counter,setCounter] = useState(0);
+
+    const convertdate = (olddate) => {
+      const date = new Date(olddate);
+      // console.log(olddate);
+      const newdate = String(date.getUTCDate()+1).padStart(2, '0')+"-"+String(date.getUTCMonth()+1).padStart(2, '0')+"-"+date.getUTCFullYear();
+      // console.log(newdate);
+      return newdate;
+    };
+
+    useEffect(()=>{
+      const getstuddents = async ()=>{
+        try {
+          const response = await axios.post('http://localhost:5000/getstudentlist');
+          // window.alert(response.data);
+          // console.log(response.data);
+          const studentsWithSerial = response.data.map((student, index) => ({
+            ...student,
+            id: index + 1, // Adding a serial number
+          }));
+          setStudentlist(studentsWithSerial);
+          // setStudentlist(response.data);
+        } catch (error) {
+          // console.log(error);
+          console.log("error");
+        }
+      }
+      getstuddents();
+    },[]);
+
+    // useEffect(() => {
+    //   // Update serial numbers when studentlist changes
+    //   if (studentlist.length > 0) {
+    //     const updatedList = studentlist.map((student, index) => ({
+    //       ...student,
+    //       serial: index + 1 // Calculate serial number (index + 1)
+    //     }));
+    //     setStudentlist(updatedList);
+    //   }
+    // }, [studentlist]);
+
+    const columns = [
+    { field: 'id', headerName: '#', width: 30},
+    { field: 'usn', headerName: 'USN', width: 130 },
+    { field: 'fullname', headerName: 'Full Name', width: 130 },
+    { field: 'email', headerName: 'E-mail', width: 150 },
+    { field: 'dob', headerName: 'Date of birth', width: 130, valueGetter: (params) => `${convertdate(params)}`},
+    { field: 'gender', headerName: 'Gender', width: 50 },
+    { field: 'pphno', headerName: 'Primary phno', width: 130 },
+    { field: 'sphno', headerName: 'Secondary phno', width: 130 },
+    { field: 'bepassingyear', headerName: 'B. E. passing year', width: 80 },
+    { field: 'ccgpa', headerName: 'Current CGPA', width: 80 },
+    { field: 'branch', headerName: 'Branch', width: 80 },
+    { field: 'syear', headerName: 'Studying year', width: 80 },
+    { field: 'ssem', headerName: 'Studying Sem', width: 80 },
+    { field: 'etype', headerName: 'Entry type', width: 80 },
+    { field: 'twelfthpyear', headerName: 'Twelfth passing year', width: 80 },
+    { field: 'twelfthper', headerName: 'Twelfth percentage', width: 80 },
+    { field: 'diplomapyear', headerName: 'Diploma passing year', width: 80 },
+    { field: 'diplomaper', headerName: 'Diploma percentage year', width: 80, valueGetter: (params) =>{if(params<0) return 0; return params}},
+    { field: 'tenthpyear', headerName: 'Tenth passing year', width: 80 },
+    { field: 'tenthper', headerName: 'Tenth Percentage', width: 80 },
+    { field: 'backlog', headerName: 'Has Backlog', width: 80 },
+    // { field: 'resume', headerName: 'Resume', width: 80 },
+    {
+      field: 'resume',
+      headerName: 'Resume',
+      width: 200,
+      renderCell: (params) => (
+        <a href={params.value} target="_blank">
+          {params.value}
+        </a>
+      ),
+    },
+  ];
+
+  return (
+    <div className='m-5'>
+    <div style={{ height: 400, width: '100%' }}>
+      <DataGrid
+        rows={studentlist}
+        columns={columns}
+        getRowId={(row) => row.usn}
+        initialState={{
+          pagination: {
+            paginationModel: { page: 0, pageSize: 5 },
+          },
+        }}
+        pageSizeOptions={[5, 10]}
+        // checkboxSelection
+      />
+    </div>
+    </div>
+    
+  );
 }
