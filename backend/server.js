@@ -232,6 +232,14 @@ app.post('/getgenderdetails',(req,res)=>{
   })
 })
 
+app.post('/getstudentdetails',(req,res)=>{
+  db.query(`SELECT usn,fullname,email,dob,gender,pphno,sphno,presentaddr,permanentaddr,bepassingyear,ccgpa,branch,syear,ssem,section,etype,twelfthpyear,twelfthper,diplomapyear,diplomaper,tenthpyear,tenthper,backlog,resume
+  FROM Student WHERE usn='${req.body.usn}'`,(err,result)=>{
+    if(err) return res.status(500).send("err");
+    res.status(200).send(result);
+  })
+})
+
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });

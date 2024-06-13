@@ -16,7 +16,7 @@ export default function Studetntlist() {
       case 3:
         return <div>case3</div>
       case 4:
-        return <div>case4</div>
+        return <Studenttable/>
       default:
         return <Student/>
     }
@@ -26,7 +26,7 @@ export default function Studetntlist() {
     <ButtonGroup variant="outlined" aria-label="Basic button group">
     <Button variant={suboption === 1 ? 'contained' : 'outlined'} onClick={()=>{setSuboption(1)}}>Student</Button>
     <Button variant={suboption === 2 ? 'contained' : 'outlined'} onClick={()=>{setSuboption(2)}}>View Student</Button>
-    <Button variant={suboption === 3 ? 'contained' : 'outlined'} onClick={()=>{setSuboption(3)}}>Edit Student</Button>
+    {/* <Button variant={suboption === 3 ? 'contained' : 'outlined'} onClick={()=>{setSuboption(3)}}>Edit Student</Button> */}
     <Button variant={suboption === 4 ? 'contained' : 'outlined'} onClick={()=>{setSuboption(4)}}>Student List</Button>
   </ButtonGroup></div>
   }
@@ -122,8 +122,11 @@ const Student = ()=>{
 const Viewstudent = ()=>{
   const [studentusn,setStudentusn] = useState("");
   const [error,setError] = useState("");
+  const [studentdetails,setStudentdetails] = useState();
+  const [studentdob,setStudentdob] = useState();
   const handelchange = (e)=>{
     setStudentusn(e.target.value);
+    setStudentdetails("");
         const pattern = /^[4][N][I][2][1-4][A-Z]{2}[0-9]{3}$/;
         if(!pattern.test(e.target.value)){
         setError("Invalid USN");
@@ -135,10 +138,36 @@ const Viewstudent = ()=>{
   const handelsubmit = (e)=>{
     e.preventDefault();
     if(!!!error){
-      console.log(studentusn);
+      // console.log(studentusn);
+        const getstudentdetails = async ()=> {
+        try {
+          const response = await axios.post('http://localhost:5000/getstudentdetails',{usn:studentusn});
+
+          if(response.data.length === 0){
+            setError("No data found");
+            return;
+          }
+          else{
+          setError("")
+          }
+
+          console.log(response.data);
+          // console.log(convertData(response.data));
+          setStudentdetails(response.data[0]);
+          const date = new Date(response.data[0].dob);
+          // const year = date.getUTCFullYear();
+          // const month = String(date.getUTCMonth() + 1).padStart(2, '0'); // Months are zero-based
+          // const day = String(date.getUTCDate()).padStart(2, '0');
+          setStudentdob(String(date.getUTCDate()+1).padStart(2, '0')+"-"+String(date.getUTCMonth()+1).padStart(2, '0')+"-"+date.getUTCFullYear())
+        } catch (error) {
+          // console.log(error);
+          console.log(error.response.data);
+        }
+      }
+      getstudentdetails();
     }
   }
-  return <div>
+  return <div className='d-flex justify-content-center'>
     <div className="card m-3">
         <form className="card-header d-flex justify-content-center p-3" onSubmit={handelsubmit}>
           <div>
@@ -156,12 +185,116 @@ const Viewstudent = ()=>{
       </div>
         <Button className="m-2" type="submit" style={{height:"35px"}} variant='contained'>Get Details</Button>
       </form>
-      <div className="card-body">
-        Hello
+      <div className="card-body overflow-scroll" style={{width:"620px"}}>
+        {!!!studentdetails ? <div className='d-flex justify-content-center'>Please Enter USN</div> : <div>
+          <div className="container-fluid row d-flex justify-content-center">
+          <div className='col-12 border rounded p-3 overflow-scroll'>
+            <div className="row border-bottom py-1">
+              <b className="col-4">USN : </b>
+              <div className="col-8">{studentdetails.usn}</div>
+            </div>
+            <div className="row border-bottom py-1">
+              <b className="col-4">Name : </b>
+              <div className="col-8">{studentdetails.fullname}</div>
+            </div>
+            <div className="row border-bottom py-1">
+              <b className="col-4">E-mail : </b>
+              <div className="col-8">{studentdetails.email}</div>
+            </div>
+            <div className="row border-bottom py-1">
+              <b className="col-4">Date of Birth : </b>
+              <div className="col-8">{studentdob}</div>
+            </div>
+            <div className="row border-bottom py-1">
+              <b className="col-4">Gender : </b>
+              <div className="col-8">{studentdetails.gender}</div>
+            </div>
+            <div className="row border-bottom py-1">
+              <b className="col-4">Primary phno : </b>
+              <div className="col-8">{studentdetails.pphno}</div>
+            </div>
+            <div className="row border-bottom py-1">
+              <b className="col-4">Secondary phno : </b>
+              <div className="col-8">{studentdetails.sphno}</div>
+            </div>
+            <div className="row border-bottom py-1">
+              <b className="col-4">Present address : </b>
+              <div className="col-8">{studentdetails.presentaddr}</div>
+            </div>
+            <div className="row border-bottom py-1">
+              <b className="col-4">Permanent address : </b>
+              <div className="col-8">{studentdetails.permanentaddr}</div>
+            </div>
+            <div className="row border-bottom py-1">
+              <b className="col-4">B. E. passing year : </b>
+              <div className="col-4">{studentdetails.bepassingyear}</div>
+            </div>
+            <div className="row border-bottom py-1">
+              <b className="col-4">Current CGPA : </b>
+              <div className="col-4">{studentdetails.ccgpa}</div>
+            </div>
+            <div className="row border-bottom py-1">
+              <b className="col-4">Branch : </b>
+              <div className="col-4">{studentdetails.branch}</div>
+            </div>
+            <div className="row border-bottom py-1">
+              <b className="col-4">Studying year : </b>
+              <div className="col-4">{studentdetails.syear}</div>
+            </div>
+            <div className="row border-bottom py-1">
+              <b className="col-4">Studying semester : </b>
+              <div className="col-4">{studentdetails.ssem}</div>
+            </div>
+            <div className="row border-bottom py-1">
+              <b className="col-4">Studying section : </b>
+              <div className="col-4">{studentdetails.section}</div>
+            </div>
+            <div className="row border-bottom py-1">
+              <b className="col-4">Entry type : </b>
+              <div className="col-4">{studentdetails.etype}</div>
+            </div>
+            {studentdetails.etype === "regular" && <><div>
+            <div className="row border-bottom py-1">
+              <b className="col-4">12th passing year : </b>
+              <div className="col-4">{studentdetails.twelfthpyear}</div>
+            </div><div className="row border-bottom py-1">
+              <b className="col-4">12th percentage : </b>
+              <div className="col-4">{studentdetails.twelfthper}</div>
+            </div>
+              </div></>}
+              {studentdetails.etype === "diploma" && <><div>
+            <div className="row border-bottom py-1">
+              <b className="col-4">Diploma passing year : </b>
+              <div className="col-4">{studentdetails.diplomapyear}</div>
+            </div><div className="row border-bottom py-1">
+              <b className="col-4">Diploma percentage : </b>
+              <div className="col-4">{studentdetails.diplomaper}</div>
+            </div>
+              </div></>}
+            <div className="row border-bottom py-1">
+              <b className="col-4">10th passing year : </b>
+              <div className="col-4">{studentdetails.tenthpyear}</div>
+            </div>
+            <div className="row border-bottom py-1">
+              <b className="col-4">10th percentage : </b>
+              <div className="col-4">{studentdetails.tenthper}</div>
+            </div>
+            <div className="row border-bottom py-1">
+              <b className="col-4">Having backlog : </b>
+              <div className="col-4">{studentdetails.backlog ? "Yes" : "No"}</div>
+            </div>
+            <div className="row border-bottom py-1">
+              <b className="col-4">Resume Link: </b>
+              <a className="col-8" href={studentdetails.resume}>{studentdetails.resume}</a>
+            </div>
+          </div>
+          </div>
+          </div>}
       </div>
     </div>
   </div>
 }
+
 const Studenttable = ()=>{
   return <div>Studenttable</div>
 }
