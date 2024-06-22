@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs');
 const session = require('express-session');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const util = require('util');
 
 const app = express();
 const port = 5000;
@@ -29,6 +30,12 @@ const db = mysql.createConnection({
   database: 'placement_portal'
 });
 
+db.query = util.promisify(db.query);
+db.execute = util.promisify(db.execute);
+// db.beginTransaction = util.promisify(db.beginTransaction);
+// db.commit = util.promisify(db.commit);
+// db.rollback = util.promisify(db.rollback);
+
 db.connect(err => {
   if (err) {
     console.error('Database connection failed:', err.stack);
@@ -36,6 +43,15 @@ db.connect(err => {
   }
   console.log('Connected to database.');
 });
+
+const objecttostring = (date)=>{
+          const year = date['$y'];
+          const month = ('0' + (date['$M'] + 1)).slice(-2);
+          const day = ('0' + date['$D']).slice(-2);
+          let newDate = "";
+          newDate = `${year}-${month}-${day}`;
+          return newDate;
+}
 
 app.post('/register', (req, res) => {
   const {formdata,newDate} = req.body;
@@ -244,6 +260,68 @@ app.post('/getstudentlist',(req,res)=>{
   db.query(`SELECT usn,fullname,email,dob,gender,pphno,sphno,presentaddr,permanentaddr,bepassingyear,ccgpa,branch,syear,ssem,section,etype,twelfthpyear,twelfthper,diplomapyear,diplomaper,tenthpyear,tenthper,backlog,resume
   FROM Student`,(err,result)=>{
     if(err) return res.status(500).send("err");
+    res.status(200).send(result);
+  })
+})
+
+app.post('/addcompany',async (req,res)=>{
+  const companydata = req.body.companydata;
+  const {arrivaldate,lastdate,branches } = req.body;
+  // console.log(req.body);
+  const hashed = bcrypt.hashSync(companydata.cpassword, 10);
+  const sql = "INSERT INTO Job (cname,email,type,role,jd,location,fulltimectc,internship,stipendpm,durationinm,backlogs,becutoff,twelfthcutoff,diplomacutoff,tenthcutoff,info,status,arrivaldate,lastdate,password) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+  const value = [companydata.cname,companydata.email,companydata.type,companydata.role,companydata.jd,companydata.location,companydata.fulltimectc,companydata.internship,companydata.stipend,companydata.duration,companydata.backlogs,companydata.becutoff,companydata.twelfthcutoff,companydata.diplomacutoff,companydata.tenthcutoff,companydata.info,companydata.status,arrivaldate,lastdate,hashed];
+  const sql2 = "INSERT INTO Branch (jid,AIML,CSE,ISE,ECE,EEE,ME,CV) values(?,?,?,?,?,?,?,?)";
+     
+  db.beginTransaction((err) => {
+    if(err) return res.status(500).send("bT failed");
+    db.query(sql, value,(err,jobResult)=> {
+      if (err) {
+          db.rollback(function() {
+              console.error('Job insertion failed:', err);
+              res.status(500).send("Error while adding company");
+          });
+          return;
+      }
+      const jobId = jobResult.insertId;
+      const value2 = [jobId,branches.AIML,branches.CSE,branches.ISE,branches.ECE,branches.EEE,branches.ME,branches.CV];
+      // console.log(jobId);
+      db.query(sql2, value2, function(err) {
+        if (err) {
+            db.rollback(function() {
+                console.error('Branch insertion failed:', err);
+                res.status(500).send("Error while adding branches");
+            });
+        } else {
+            db.commit(function(err) {
+                if (err) {
+                    db.rollback(function() {
+                        console.error('Transaction commit failed:', err);
+                        res.status(500).send("Error committing transaction");
+                    });
+                } else {
+                    res.status(201).send("Company and branches added successfully");
+                }
+            });
+        }
+    });
+  })
+})
+
+})
+
+app.post('/getjobidandname',(req,res)=>{
+  db.query(`SELECT jid,cname FROM Job`,(err,result)=>{
+    if(err) return res.status(500).send("err");
+    res.status(200).send(result);
+  })
+})
+
+app.post('/getcompanydetails',(req,res)=>{
+  // console.log(req.body);
+  db.query(`SELECT * FROM Job where jid=${req.body.cid}`,(err,result)=>{
+    if(err) return res.status(500).send("err");
+    console.log(result);
     res.status(200).send(result);
   })
 })

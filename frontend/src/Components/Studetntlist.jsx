@@ -5,6 +5,7 @@ import {PieChart} from '@mui/x-charts/PieChart';
 import axios from 'axios';
 import TextField from '@mui/material/TextField';
 import { DataGrid } from '@mui/x-data-grid';
+import Registration from '../Registration';
 
 export default function Studetntlist() {
   const [suboption,setSuboption] = useState(1);
@@ -13,10 +14,12 @@ export default function Studetntlist() {
       case 1:
         return <Student/>;
       case 2:
-        return <Viewstudent/>
+        return <Registration/>
       case 3:
-        return <div>case3</div>
+        return <Viewstudent/>
       case 4:
+        return <div>case3</div>
+      case 5:
         return <Studenttable/>
       default:
         return <Student/>
@@ -26,9 +29,10 @@ export default function Studetntlist() {
     return <div className='d-flex justify-content-center m-1'>
     <ButtonGroup variant="outlined" aria-label="Basic button group">
     <Button variant={suboption === 1 ? 'contained' : 'outlined'} onClick={()=>{setSuboption(1)}}>Student</Button>
-    <Button variant={suboption === 2 ? 'contained' : 'outlined'} onClick={()=>{setSuboption(2)}}>View Student</Button>
-    {/* <Button variant={suboption === 3 ? 'contained' : 'outlined'} onClick={()=>{setSuboption(3)}}>Edit Student</Button> */}
-    <Button variant={suboption === 4 ? 'contained' : 'outlined'} onClick={()=>{setSuboption(4)}}>Student List</Button>
+    {/* <Button variant={suboption === 2 ? 'contained' : 'outlined'} onClick={()=>{setSuboption(2)}}>Add Student</Button> */}
+    <Button variant={suboption === 3 ? 'contained' : 'outlined'} onClick={()=>{setSuboption(3)}}>View Student</Button>
+    {/* <Button variant={suboption === 4 ? 'contained' : 'outlined'} onClick={()=>{setSuboption(4)}}>Edit Student</Button> */}
+    <Button variant={suboption === 5 ? 'contained' : 'outlined'} onClick={()=>{setSuboption(5)}}>Student List</Button>
   </ButtonGroup></div>
   }
   return (<div>
@@ -286,7 +290,7 @@ const Viewstudent = ()=>{
             </div>
             <div className="row border-bottom py-1">
               <b className="col-4">Resume Link: </b>
-              <a className="col-8" href={studentdetails.resume}>{studentdetails.resume}</a>
+              <a className="col-8" target='_blank' href={studentdetails.resume}>{studentdetails.resume}</a>
             </div>
           </div>
           </div>

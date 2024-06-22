@@ -10,6 +10,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import Adminprofile from './Adminprofile';
 import Adminlist from './Adminlist';
 import Studetntlist from './Studetntlist';
+import Companylist from './Companylist';
 
 export default function Admindashboard({user,handleLogout}) {
     const [open, setOpen] = React.useState(false);
@@ -30,7 +31,7 @@ export default function Admindashboard({user,handleLogout}) {
       case 2:
         return <Studetntlist/>;
       case 3:
-        return <div>Company</div>;
+        return <Companylist/>;
       case 11:
         return <Adminlist user={user}/>;
       case 12:

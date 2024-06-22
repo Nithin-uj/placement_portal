@@ -1,52 +1,60 @@
-import * as React from 'react';
-import { DataGrid } from '@mui/x-data-grid';
+import React, { useState } from 'react';
 
-const columns = [
-  { field: 'id', headerName: 'ID', width: 70 },
-  { field: 'firstName', headerName: 'First name', width: 130 },
-  { field: 'lastName', headerName: 'Last name', width: 130 },
-  {
-    field: 'age',
-    headerName: 'Age',
-    type: 'number',
-    width: 90,
-  },
-  {
-    field: 'fullName',
-    headerName: 'Full name',
-    description: 'This column has a value getter and is not sortable.',
-    sortable: false,
-    width: 160,
-    valueGetter: (value, row) => `${row.firstName || ''} ${row.lastName || ''}`,
-  },
+const SearchableDropdown = ({ optionss }) => {
+  const options = [
+    'Apple', 'Banana', 'Cherry', 'Date', 'Elderberry',
+    'Fig', 'Grape', 'Honeydew', 'Indian Fig', 'Jackfruit',
+    'Kiwi', 'Lemon', 'Mango', 'Nectarine', 'Orange',
+    'Papaya', 'Quince', 'Raspberry', 'Strawberry', 'Tangerine',
+    'Ugli fruit', 'Vanilla bean', 'Watermelon', 'Xigua', 'Yuzu', 'Zucchini'
 ];
+    const [searchTerm, setSearchTerm] = useState('');
+    const [filteredOptions, setFilteredOptions] = useState(options);
+    const [showDropdown, setShowDropdown] = useState(false);
 
-const rows = [
-  { id: 1, lastName: 'Snow', firstName: 'Jon', age: 35 },
-  { id: 2, lastName: 'Lannister', firstName: 'Cersei', age: 42 },
-  { id: 3, lastName: 'Lannister', firstName: 'Jaime', age: 45 },
-  { id: 4, lastName: 'Stark', firstName: 'Arya', age: 16 },
-  { id: 5, lastName: 'Targaryen', firstName: 'Daenerys', age: null },
-  { id: 6, lastName: 'Melisandre', firstName: null, age: 150 },
-  { id: 7, lastName: 'Clifford', firstName: 'Ferrara', age: 44 },
-  { id: 8, lastName: 'Frances', firstName: 'Rossini', age: 36 },
-  { id: 9, lastName: 'Roxie', firstName: 'Harvey', age: 65 },
-];
+    const handleSearchChange = (event) => {
+        const search = event.target.value;
+        setSearchTerm(search);
+        const filtered = options.filter(option =>
+            option.toLowerCase().includes(search.toLowerCase())
+        );
+        setFilteredOptions(filtered);
+    };
 
-export default function DataTable() {
-  return (
-    <div style={{ height: 400, width: '100%' }}>
-      <DataGrid
-        rows={rows}
-        columns={columns}
-        initialState={{
-          pagination: {
-            paginationModel: { page: 0, pageSize: 5 },
-          },
-        }}
-        pageSizeOptions={[5, 10]}
-        checkboxSelection
-      />
-    </div>
-  );
-}
+    const handleOptionClick = (option) => {
+        setSearchTerm(option);
+        setShowDropdown(false);
+    };
+
+    return (
+        <div className="position-relative">
+            <input
+                type="text"
+                value={searchTerm}
+                onChange={handleSearchChange}
+                onFocus={() => setShowDropdown(true)}
+                className="form-control"
+                placeholder="Search..."
+            />
+            {showDropdown && (
+                <ul className="list-group position-absolute w-100" style={{ maxHeight: '150px', overflowY: 'auto' }}>
+                    {filteredOptions.length > 0 ? (
+                        filteredOptions.map((option, index) => (
+                            <li
+                                key={index}
+                                onClick={() => handleOptionClick(option)}
+                                className="list-group-item cursor-pointer"
+                            >
+                                {option}
+                            </li>
+                        ))
+                    ) : (
+                        <li className="list-group-item">No results found</li>
+                    )}
+                </ul>
+            )}
+        </div>
+    );
+};
+
+export default SearchableDropdown;
