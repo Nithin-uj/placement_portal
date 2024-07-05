@@ -516,7 +516,10 @@ app.post("/changecpassword",(req,res)=>{
   })
 })
 
-//student
+app.post("/sample",(req,res)=>{
+    console.log("Client contacted");
+   return res.status(200).send("Server Connected");
+})
 
 app.post('/getappliablelist',(req,res)=>{
   const {usn,sbranch} = req.body;
