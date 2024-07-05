@@ -13,6 +13,7 @@ import Select from "@mui/material/Select";
 import Alert from "@mui/material/Alert";
 import Cusalert from "./Alert"
 import axios from 'axios'
+import { address } from "../Address";
 
 const theme = createTheme({
   palette: {
@@ -148,7 +149,7 @@ function Registration() {
           newDate = `${year}-${month}-${day}`;
           // console.log("New Date:", newDate);
             try {
-              const response = await axios.post('http://localhost:5000/register', {formdata,newDate});
+              const response = await axios.post(address+'/register', {formdata,newDate});
               // console.log(response.data.message);
               setAlertmsg(response.data.message);
               setAlertpath("/student-login")

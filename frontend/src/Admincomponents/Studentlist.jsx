@@ -5,7 +5,10 @@ import {PieChart} from '@mui/x-charts/PieChart';
 import axios from 'axios';
 import TextField from '@mui/material/TextField';
 import { DataGrid } from '@mui/x-data-grid';
-import Registration from '../Registration';
+import Registrationbyadmin from './Registrationbyadmin';
+import { address } from '../Address';
+import Editstudent from './Editstudent';
+import Switch from '@mui/material/Switch';
 
 export default function Studetntlist() {
   const [suboption,setSuboption] = useState(1);
@@ -14,11 +17,11 @@ export default function Studetntlist() {
       case 1:
         return <Student/>;
       case 2:
-        return <Registration/>
+        return <Registrationbyadmin/>
       case 3:
         return <Viewstudent/>
       case 4:
-        return <div>case3</div>
+        return <Editstudent/>
       case 5:
         return <Studenttable/>
       default:
@@ -26,16 +29,40 @@ export default function Studetntlist() {
     }
   }
   const Studentmenu = ()=>{
-    return <div className='d-flex justify-content-center m-1'>
-    <ButtonGroup variant="outlined" aria-label="Basic button group">
-    <Button variant={suboption === 1 ? 'contained' : 'outlined'} onClick={()=>{setSuboption(1)}}>Student</Button>
-    {/* <Button variant={suboption === 2 ? 'contained' : 'outlined'} onClick={()=>{setSuboption(2)}}>Add Student</Button> */}
-    <Button variant={suboption === 3 ? 'contained' : 'outlined'} onClick={()=>{setSuboption(3)}}>View Student</Button>
-    {/* <Button variant={suboption === 4 ? 'contained' : 'outlined'} onClick={()=>{setSuboption(4)}}>Edit Student</Button> */}
-    <Button variant={suboption === 5 ? 'contained' : 'outlined'} onClick={()=>{setSuboption(5)}}>Student List</Button>
-  </ButtonGroup></div>
+    return <div>
+      <div className='d-flex justify-content-center m-1 d-block d-sm-none'>
+        <div class="accordion" id="accordionExample" style={{width:"max-content"}}>
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="headingOne">
+              <button class="accordion-button p-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                &nbsp;View options&nbsp;
+              </button>
+            </h2>
+            <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+              <div class="accordion-body p-0" style={{width:"max-content"}}>
+              <ButtonGroup variant="outlined" aria-label="Basic button group" orientation='vertical'>
+                <Button variant={suboption === 1 ? 'contained' : 'outlined'} onClick={()=>{setSuboption(1)}}>Student</Button>
+                <Button variant={suboption === 2 ? 'contained' : 'outlined'} onClick={()=>{setSuboption(2)}}>Add Student</Button>
+                <Button variant={suboption === 3 ? 'contained' : 'outlined'} onClick={()=>{setSuboption(3)}}>View Student</Button>
+                <Button variant={suboption === 4 ? 'contained' : 'outlined'} onClick={()=>{setSuboption(4)}}>Edit Student</Button>
+                <Button variant={suboption === 5 ? 'contained' : 'outlined'} onClick={()=>{setSuboption(5)}}>Student List</Button>
+              </ButtonGroup>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className='justify-content-center m-1 d-none d-sm-flex'>
+      <ButtonGroup variant="outlined" aria-label="Basic button group">
+      <Button variant={suboption === 1 ? 'contained' : 'outlined'} onClick={()=>{setSuboption(1)}}>Student</Button>
+      <Button variant={suboption === 2 ? 'contained' : 'outlined'} onClick={()=>{setSuboption(2)}}>Add Student</Button>
+      <Button variant={suboption === 3 ? 'contained' : 'outlined'} onClick={()=>{setSuboption(3)}}>View Student</Button>
+      <Button variant={suboption === 4 ? 'contained' : 'outlined'} onClick={()=>{setSuboption(4)}}>Edit Student</Button>
+      <Button variant={suboption === 5 ? 'contained' : 'outlined'} onClick={()=>{setSuboption(5)}}>Student List</Button>
+    </ButtonGroup></div>
+  </div>
   }
-  return (<div>
+  return (<div style={{minHeight:"50vh"}}>
     <div>{Studentmenu()}</div>
     <div>{rendersuboption()}</div>
     </div>
@@ -45,10 +72,12 @@ export default function Studetntlist() {
 const Student = ()=>{
   const [branchdetails,setBranchdetails] = useState([]);
   const [genderdetails,setGenderdetails] = useState([]);
+  const [editcontrols,setEditcontrols] = useState(null);
   useEffect(()=>{
-    const getbranch = async ()=> {
+
+  const getbranch = async ()=> {
     try {
-      const response = await axios.post('http://localhost:5000/getbranchdetails');
+      const response = await axios.post(address+'/getbranchdetails');
       // console.log(response.data);
       function convertData(array) {
         return array.map((obj, index) => {
@@ -67,7 +96,7 @@ const Student = ()=>{
   }
   const getgender = async ()=>{
     try {
-      const response = await axios.post('http://localhost:5000/getgenderdetails');
+      const response = await axios.post(address+'/getgenderdetails');
       // console.log(response.data);
       function convertData(array) {
         return array.map((obj, index) => {
@@ -92,34 +121,69 @@ const Student = ()=>{
       console.log(error);
     }
   }
+  const getcontrols = async ()=>{
+    try {
+      const response = await axios.post(address+"/geteditcontrols")
+      setEditcontrols(response.data[0].value)
+    } catch (error) {
+      console.log("Failed to get controls")
+    }
+  }
 
   getbranch();
   getgender();
+  getcontrols();
+
   },[])
-  return <div className='m-2 d-flex flex-wrap justify-content-around'>
-    <div style={{width:"max-content"}} className='rounded border m-1'>
-      <b className='d-flex justify-content-center m-1'>Students by branch</b>
-      <PieChart
-        series={[
-          {
-            data: branchdetails,
-          },
-        ]}
-        width={400}
-        height={200}
-      />
-    </div>
-    <div style={{width:"max-content"}} className='rounded border m-1'>
-      <b className='d-flex justify-content-center m-1'>Students by Gender</b>
-      <PieChart
-        series={[
-          {
-            data: genderdetails,
-          },
-        ]}
-        width={400}
-        height={200}
-      />
+
+  const handlecontrolschange = async (e)=>{
+    // console.log(e.target.checked);
+    setEditcontrols(e.target.checked);
+    try{
+      const response = await axios.post(address+"/updatecontrols",{value:e.target.checked})
+      // console.log(response.data)
+    }
+    catch(error){
+      console.log(error);
+    }
+  }
+  return <div>
+      <div className='card m-2'>
+        <b className='card-header'>Contorl panel</b>
+        <div className='card-body'>
+          Allow students to edit their details : 
+          <Switch
+          checked={editcontrols}
+          onChange={handlecontrolschange}
+          inputProps={{ 'aria-label': 'controlled' }}
+        />
+        </div>
+      </div>
+    <div className='m-2 d-flex flex-wrap justify-content-around'>
+      <div style={{width:"max-content"}} className='rounded border m-1 overflow-scroll'>
+        <b className='d-flex justify-content-center m-1'>Students by branch</b>
+        <PieChart
+          series={[
+            {
+              data: branchdetails,
+            },
+          ]}
+          width={400}
+          height={200}
+        />
+      </div>
+      <div style={{width:"max-content"}} className='rounded border m-1 overflow-scroll'>
+        <b className='d-flex justify-content-center m-1'>Students by Gender</b>
+        <PieChart
+          series={[
+            {
+              data: genderdetails,
+            },
+          ]}
+          width={400}
+          height={200}
+        />
+      </div>
     </div>
   </div>
 }
@@ -146,8 +210,7 @@ const Viewstudent = ()=>{
       // console.log(studentusn);
         const getstudentdetails = async ()=> {
         try {
-          const response = await axios.post('http://localhost:5000/getstudentdetails',{usn:studentusn});
-
+          const response = await axios.post(address+'/getstudentdetails',{usn:studentusn});
           if(response.data.length === 0){
             setError("No data found");
             return;
@@ -156,7 +219,7 @@ const Viewstudent = ()=>{
           setError("")
           }
 
-          console.log(response.data);
+          // console.log(response.data);
           // console.log(convertData(response.data));
           setStudentdetails(response.data[0]);
           const date = new Date(response.data[0].dob);
@@ -172,6 +235,22 @@ const Viewstudent = ()=>{
       getstudentdetails();
     }
   }
+  const removestudent = async ()=>{
+    try{
+      const response = await axios.post(address+"/removestudent",{usn:studentusn});
+      if(response.status === 200){
+        window.alert("Student removed");
+      }
+      }
+      catch(error){
+        window.alert("Failed to remove student");
+        console.log(error)
+      }
+    console.log("removed");
+    setStudentusn("")
+    setStudentdetails(null)
+  }
+  
   return <div className='d-flex justify-content-center'>
     <div className="card m-3">
         <form className="card-header d-flex justify-content-center p-3" onSubmit={handelsubmit}>
@@ -181,6 +260,7 @@ const Viewstudent = ()=>{
           label="USN"
           variant="outlined"
           name="usn"
+          value={studentusn}
           error={!!error}
           helperText={error}
           required
@@ -188,12 +268,13 @@ const Viewstudent = ()=>{
           fullWidth        
         />
       </div>
-        <Button className="m-2" type="submit" style={{height:"35px"}} variant='contained'>Get Details</Button>
+        <Button className="m-2" type="submit" variant='contained'>Get Details</Button>
       </form>
-      <div className="card-body overflow-scroll" style={{width:"620px"}}>
-        {!!!studentdetails ? <div className='d-flex justify-content-center'>Please Enter USN</div> : <div>
-          <div className="container-fluid row d-flex justify-content-center">
+      <div className="card-body overflow-scroll">
+        {!!!studentdetails ? <div className='d-flex justify-content-center overflow-scroll'>Please Enter USN</div> : <div className='overflow-scroll'>
+          <div className="container-fluid row d-flex justify-content-center" style={{width:"620px"}}>
           <div className='col-12 border rounded p-3 overflow-scroll'>
+            <div className="d-flex justify-content-end"><Button variant='outlined' color='error' onClick={removestudent}>Remove student</Button></div>
             <div className="row border-bottom py-1">
               <b className="col-4">USN : </b>
               <div className="col-8">{studentdetails.usn}</div>
@@ -316,7 +397,7 @@ const Studenttable = ()=>{
     useEffect(()=>{
       const getstuddents = async ()=>{
         try {
-          const response = await axios.post('http://localhost:5000/getstudentlist');
+          const response = await axios.post(address+'/getstudentlist');
           // window.alert(response.data);
           // console.log(response.data);
           const studentsWithSerial = response.data.map((student, index) => ({
@@ -378,9 +459,10 @@ const Studenttable = ()=>{
       ),
     },
   ];
+  
 
   return (
-    <div className='m-5'>
+    <div className='m-3'>
     <div style={{ height: 400, width: '100%' }}>
       <DataGrid
         rows={studentlist}

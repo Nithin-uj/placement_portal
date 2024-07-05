@@ -10,6 +10,7 @@ import logo from "./image.png"
 // import Alert from "@mui/material/Alert";
 import axios from 'axios'
 import { Link,useNavigate } from 'react-router-dom'
+import {address} from '../Address'
 
 function Studentlogin() {
   const navigate = useNavigate();
@@ -51,7 +52,7 @@ function Studentlogin() {
       return null;
     }
     try {
-      const response = await axios.post('http://localhost:5000/login', values, { withCredentials: true });
+      const response = await axios.post(address+'/login', values, { withCredentials: true });
       if(response.data.message === "Login successful"){
       navigate('/student');
       }

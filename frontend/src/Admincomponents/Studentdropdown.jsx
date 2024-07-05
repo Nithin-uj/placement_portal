@@ -1,28 +1,28 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
-const SearchableDropdown = ({ optionss }) => {
-  const options = [
-    'Apple', 'Banana', 'Cherry', 'Date', 'Elderberry',
-    'Fig', 'Grape', 'Honeydew', 'Indian Fig', 'Jackfruit',
-    'Kiwi', 'Lemon', 'Mango', 'Nectarine', 'Orange',
-    'Papaya', 'Quince', 'Raspberry', 'Strawberry', 'Tangerine',
-    'Ugli fruit', 'Vanilla bean', 'Watermelon', 'Xigua', 'Yuzu', 'Zucchini'
-];
-    const [searchTerm, setSearchTerm] = useState('');
+const Studentdropdown = ({options,searchTerm,setSearchTerm,selectedOption,setSelectedOption }) => {
+    // const [searchTerm, setSearchTerm] = useState('');
     const [filteredOptions, setFilteredOptions] = useState(options);
     const [showDropdown, setShowDropdown] = useState(false);
+
+    useEffect(()=>{
+        setFilteredOptions(options);
+    },[options])
 
     const handleSearchChange = (event) => {
         const search = event.target.value;
         setSearchTerm(search);
         const filtered = options.filter(option =>
-            option.toLowerCase().includes(search.toLowerCase())
+            option.usn.toString().includes(search.toUpperCase()) ||
+            option.fullname.toLowerCase().includes(search.toLowerCase())
         );
         setFilteredOptions(filtered);
+        setShowDropdown(true); // Always show dropdown on search
     };
 
     const handleOptionClick = (option) => {
-        setSearchTerm(option);
+        setSelectedOption(option.usn);
+        setSearchTerm(option.usn +" "+ option.fullname);
         setShowDropdown(false);
     };
 
@@ -37,7 +37,7 @@ const SearchableDropdown = ({ optionss }) => {
                 placeholder="Search..."
             />
             {showDropdown && (
-                <ul className="list-group position-absolute w-100" style={{ maxHeight: '150px', overflowY: 'auto' }}>
+                <ul className="list-group position-absolute" style={{ width:"95%", maxHeight: '150px', overflowY: 'auto' ,zIndex:'100', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}}>
                     {filteredOptions.length > 0 ? (
                         filteredOptions.map((option, index) => (
                             <li
@@ -45,7 +45,7 @@ const SearchableDropdown = ({ optionss }) => {
                                 onClick={() => handleOptionClick(option)}
                                 className="list-group-item cursor-pointer"
                             >
-                                {option}
+                                {option.usn +" "+ option.fullname}
                             </li>
                         ))
                     ) : (
@@ -57,4 +57,4 @@ const SearchableDropdown = ({ optionss }) => {
     );
 };
 
-export default SearchableDropdown;
+export default Studentdropdown;

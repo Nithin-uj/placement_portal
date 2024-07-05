@@ -17,6 +17,7 @@ import Select from "@mui/material/Select";
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import { Box } from '@mui/material';
+import { address } from '../Address';
 
 export default function Adminlist({user}){
 
@@ -45,7 +46,7 @@ export default function Adminlist({user}){
     useEffect(()=>{
       const adminlistfunction = async () => {
       try {
-        const response = await axios.post('http://localhost:5000/adminlist', { withCredentials: true });
+        const response = await axios.post(address+'/adminlist', { withCredentials: true });
         setAdminlist(response.data);
       } catch (error) {
         // console.log(error.response.data);
@@ -94,7 +95,7 @@ export default function Adminlist({user}){
       e.preventDefault();
       if(!!!errors.email && !!!errors.phno && !!!errors.cpassword){
         try {
-          const response = await axios.post('http://localhost:5000/adminregister',newadmin);
+          const response = await axios.post(address+'/adminregister',newadmin);
           // console.log(response.data);
           setAlert({
             show : true,
@@ -161,7 +162,7 @@ export default function Adminlist({user}){
         // console.log(e.target.value);
         const removeadmin = async ()=>{
           try {
-            const response = await axios.post('http://localhost:5000/removeadmin',{email : e.target.value});
+            const response = await axios.post(address+'/removeadmin',{email : e.target.value});
             setAdminlist(adminlist.filter(admin => admin.email !== e.target.value));
             window.alert(response.data);
           } catch (error) {
@@ -230,7 +231,7 @@ export default function Adminlist({user}){
       useEffect(()=>{
         const removeadmin = async ()=>{
           try {
-            const response = await axios.post('http://localhost:5000/admingetedit',{"email" : `${adminemail}`});
+            const response = await axios.post(address+'/admingetedit',{"email" : `${adminemail}`});
             // window.alert(response.data);
             // console.log(response.data[0]);
             setAdmindata(response.data[0]);
@@ -284,7 +285,7 @@ export default function Adminlist({user}){
         e.preventDefault();
         if(!!!editerrors.email && !!!editerrors.phno && !!!editerrors.cpassword){
           try {
-            const response = await axios.post('http://localhost:5000/adminedit',{admindata,adminemail});
+            const response = await axios.post(address+'/adminedit',{admindata,adminemail});
             window.alert(response.data);
             // window.alert("Admin details updated");
             setEditadmin("");
@@ -360,7 +361,7 @@ export default function Adminlist({user}){
             <TableCell align="center"><b>E-mail</b></TableCell>
             <TableCell align="center"><b>Type</b></TableCell>
             <TableCell align="center"><b>Phone no.</b></TableCell>
-            {user.admintype !== "pc" && <TableCell align="center"><b>Operation</b></TableCell> }
+            {user.admintype !== "pc" && <TableCell align="center" style={{minWidth:"200px"}}><b>Operation</b></TableCell> }
           </TableRow>
         </TableHead>
         <TableBody>
@@ -374,7 +375,7 @@ export default function Adminlist({user}){
                   <TableCell align="center">{row.email}</TableCell>
                   <TableCell align="center">{row.type}</TableCell>
                   <TableCell align="center">{row.phno}</TableCell>
-                 {user.admintype !== "pc" &&  <TableCell align="right">
+                 {user.admintype !== "pc" &&  <TableCell align="center">
                     {/* Add any operation buttons or elements here */}
                     <Button size='small' variant='contained' className='me-2' onClick={(e)=>{setEditadmin(row.email);}} disabled={user.adminemail === row.email ? true : false}>Edit</Button>
                     <Button size='small' variant='outlined' color="error" value={row.email} onClick={(e)=>{handelremove(e)}} disabled={user.adminemail === row.email ? true : false}>Remove</Button>

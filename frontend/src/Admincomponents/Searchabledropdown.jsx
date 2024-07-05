@@ -33,7 +33,7 @@ const SearchableDropdown = ({ options,searchTerm,setSearchTerm,selectedOption,se
                 placeholder="Search..."
             />
             {showDropdown && (
-                <ul className="list-group position-absolute w-100" style={{ maxHeight: '150px', overflowY: 'auto' ,zIndex:'100', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}}>
+                <ul className="list-group position-absolute" style={{ width:"95%", maxHeight: '150px', overflowY: 'auto' ,zIndex:'100', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}}>
                     {filteredOptions.length > 0 ? (
                         filteredOptions.map((option, index) => (
                             <li

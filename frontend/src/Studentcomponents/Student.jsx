@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import Studentdashboard from './Studentdashboard';
+import Header from '../Components/Header';
+import Footer from '../Components/Footer';
+import { address } from '../Address';
 
 function Profile() {
   const [user, setUser] = useState(null);
@@ -9,7 +13,8 @@ function Profile() {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/me', { withCredentials: true });
+        const response = await axios.get(address+'/me', { withCredentials: true });
+        // const response = await axios.get(address+'/me', { withCredentials: true });
         setUser(response.data);
       } catch (error) {
         // console.error(error.response);
@@ -21,7 +26,7 @@ function Profile() {
 
   const handleLogout = async () => {
     try {
-      await axios.post('http://localhost:5000/logout', {}, { withCredentials: true });
+      await axios.post(address+'/logout', {}, { withCredentials: true });
       navigate('/student-login');
     } catch (error) {
       console.error(error);
@@ -31,11 +36,16 @@ function Profile() {
   if (!user) return <div>Loading...</div>;
 
   return (
+    // <div>
+    //   <h2>Profile</h2>
+    //   <p>USN: {user.usn}</p>
+    //   <p>Email: {user.email}</p>
+    //   <button onClick={handleLogout}>Logout</button>
+    // </div>
     <div>
-      <h2>Profile</h2>
-      <p>USN: {user.usn}</p>
-      <p>Email: {user.email}</p>
-      <button onClick={handleLogout}>Logout</button>
+      <Header/>
+      <Studentdashboard user={user} handleLogout={handleLogout}/>
+      <Footer/>
     </div>
   );
 }

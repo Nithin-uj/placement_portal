@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import Header from './Header';
-import Admindashboard from './Components/Admindashboard';
-import Footer from './Footer';
+import Header from '../Components/Header';
+import Admindashboard from './Admindashboard';
+import Footer from '../Components/Footer';
 import Box from '@mui/material/Box';
 import CircularProgress from '@mui/material/CircularProgress';
+import { address } from '../Address';
 
 function Profile() {
   const [user, setUser] = useState(null);
@@ -14,7 +15,7 @@ function Profile() {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/isadmin', { withCredentials: true });
+        const response = await axios.get(address+'/isadmin', { withCredentials: true });
         setUser(response.data);
       } catch (error) {
         // console.error(error.response);
@@ -27,7 +28,7 @@ function Profile() {
 
   const handleLogout = async () => {
     try {
-      await axios.post('http://localhost:5000/logout', {}, { withCredentials: true });
+      await axios.post(address+'/logout', {}, { withCredentials: true });
       navigate('/admin-login');
     } catch (error) {
       console.error(error);

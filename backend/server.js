@@ -11,7 +11,7 @@ const port = 5000;
 
 app.use(bodyParser.json());
 app.use(cors({
-  origin: ['http://localhost:3000','http://192.168.201.100:3000'],
+  origin: ['http://localhost:3000','http://192.168.203.194:3000'],
   credentials: true
 }));
 
@@ -27,7 +27,8 @@ const db = mysql.createConnection({
   host: 'localhost',
   user: 'root',
   password: 'Nithin@20',
-  database: 'placement_portal'
+  database: 'placement_portal',
+  multipleStatements: true
 });
 
 db.query = util.promisify(db.query);
@@ -70,12 +71,13 @@ else if(formdata.twelfthpyear === '' || formdata.twelfthper === ''){
 if(formdata.sphno === ''){
   formdata.sphno = null;
 }
+
 const sql = "INSERT INTO Student (usn,email,fullname,dob,gender,pphno,sphno,presentaddr,permanentaddr,bepassingyear,ccgpa,branch,syear,ssem,section,etype,twelfthpyear,twelfthper,diplomapyear,diplomaper,tenthpyear,tenthper,backlog,cpassword) values(?)";
 const value = [formdata.usn,formdata.email,formdata.fullname,newDate,formdata.gender,formdata.pphno,formdata.sphno,formdata.presentaddr,formdata.permanentaddr,formdata.bepassingyear,formdata.ccgpa,formdata.branch,formdata.syear,formdata.ssem,formdata.section,formdata.etype,formdata.twelfthpyear,formdata.twelfthper,formdata.diplomapyear,formdata.diplomaper,formdata.tenthpyear,formdata.tenthper,formdata.backlog,hashedPassword];
   db.query(sql, [value], (err, result) => {
     if (err) {
         if(err.code === "ER_DUP_ENTRY"){
-            return res.status(500).send('USN Already Exist');
+            return res.status(501).send('USN Already Exist');
         }
         // console.log(err);
         return res.status(500).send('Server down failed to register');
@@ -99,10 +101,21 @@ app.post('/adminregister',(req,res)=>{
   // res.status(200).send({ message: 'Sent' });
 })
 
+app.post('/removestudent',(req,res)=>{
+  const {usn} = req.body;
+  sql = `DELETE from Student where usn='${usn}'`;
+  db.query(sql,(err,result)=>{
+    // if(err) return res.status(500).send("Failed to remove student");
+    if(err) return res.status(500).send(err);
+    else{
+      return res.status(200).send("Student removed")
+    }
+  })
+})
 
 app.post('/login', (req, res) => {
   const { usn, password } = req.body;
-  db.query('SELECT usn,email,cpassword FROM Student WHERE usn = ?', [usn], (err, results) => {
+  db.query('SELECT usn,fullname,email,cpassword FROM Student WHERE usn = ?', [usn], (err, results) => {
     if (err) return res.status(500).send('Server error');
     if (results.length === 0) return res.status(404).send('USN Not Registered');
 
@@ -112,6 +125,7 @@ app.post('/login', (req, res) => {
     if (!passwordIsValid) return res.status(401).send('Incorrect password');
       req.session.user = {
       usn: user.usn,
+      fullname: user.fullname,
       email: user.email
     };
     // console.log(req.session);
@@ -133,6 +147,13 @@ app.get('/isadmin', (req, res) => {
     return res.status(401).send('Not authenticated');
   }
   res.status(200).send(req.session.admin);
+});
+
+app.get('/iscompany', (req, res) => {
+  if (!req.session.company) {
+    return res.status(401).send('Not authenticated');
+  }
+  res.status(200).send(req.session.company);
 });
 
 // Logout User
@@ -165,6 +186,25 @@ app.post('/adminlogin', (req, res) => {
     res.status(200).send({ message: 'Login successful' });
   });
 });
+
+app.post('/companylogin',(req,res)=>{
+  const { email, password } = req.body;
+  db.query('SELECT cname,password,email FROM Job WHERE email = ?', [email], (err, results) => {
+    if (err) return res.status(500).send('Server error');
+    if (results.length === 0) return res.status(404).send('Email not found');
+    const res2 = results[0];
+    const passwordIsValid = bcrypt.compareSync(password, res2.password);
+
+    if (!passwordIsValid) return res.status(401).send('Incorrect password');
+      req.session.company = {
+      cname: res2.cname,
+      cemail: res2.email,
+    };
+    // console.log(req.session);
+    
+    res.status(200).send({ message: 'Login successful' });
+  });
+})
 
 app.post('/adminlist',(req,res)=>{
   db.query("SELECT name,email,type,phno FROM Admin order by name",(err,result)=>{
@@ -240,14 +280,12 @@ app.post('/getbranchdetails',(req,res)=>{
     res.status(200).send(result);
   })
 })
-
 app.post('/getgenderdetails',(req,res)=>{
   db.query(`select gender,count(USN) as value from Student group by gender`,(err,result)=>{
     if(err) return res.status(500).send("err");
     res.status(200).send(result);
   })
 })
-
 app.post('/getstudentdetails',(req,res)=>{
   db.query(`SELECT usn,fullname,email,dob,gender,pphno,sphno,presentaddr,permanentaddr,bepassingyear,ccgpa,branch,syear,ssem,section,etype,twelfthpyear,twelfthper,diplomapyear,diplomaper,tenthpyear,tenthper,backlog,resume
   FROM Student WHERE usn='${req.body.usn}'`,(err,result)=>{
@@ -255,10 +293,47 @@ app.post('/getstudentdetails',(req,res)=>{
     res.status(200).send(result);
   })
 })
-
+app.post('/getusnandname',(req,res)=>{
+  db.query(`SELECT usn,fullname FROM Student`,(err,result)=>{
+    if(err) return res.status(500).send("err");
+    res.status(200).send(result);
+  })
+})
 app.post('/getstudentlist',(req,res)=>{
   db.query(`SELECT usn,fullname,email,dob,gender,pphno,sphno,presentaddr,permanentaddr,bepassingyear,ccgpa,branch,syear,ssem,section,etype,twelfthpyear,twelfthper,diplomapyear,diplomaper,tenthpyear,tenthper,backlog,resume
   FROM Student`,(err,result)=>{
+    if(err) return res.status(500).send("err");
+    res.status(200).send(result);
+  })
+})
+
+app.post('/editstudent',(req,res)=>{
+  const {sd} = req.body;
+
+  if(sd.diplomapyear === '' || sd.diplomaper === ''){
+    sd.diplomapyear = 0;
+    sd.diplomaper = -1;
+  }
+  else if(sd.twelfthpyear === '' || sd.twelfthper === ''){
+      sd.twelfthpyear = 0;
+      sd.twelfthper = -1; 
+  }
+  if(sd.sphno === ''){
+    sd.sphno = null;
+  }
+
+  const sql = `UPDATE Student SET email=(?),fullname=(?),dob=(?),gender=(?),pphno=(?),sphno=(?),presentaddr=(?),permanentaddr=(?),bepassingyear=(?),ccgpa=(?),branch=(?),syear=(?),ssem=(?),section=(?),etype=(?),twelfthpyear=(?),twelfthper=(?),diplomapyear=(?),diplomaper=(?),tenthpyear=(?),tenthper=(?),backlog=(?) WHERE usn='${sd.usn}'`;
+  const value = [sd.email,sd.fullname,sd.dob,sd.gender,sd.pphno,sd.sphno,sd.presentaddr,sd.permanentaddr,sd.bepassingyear,sd.ccgpa,sd.branch,sd.syear,sd.ssem,sd.section,sd.etype,sd.twelfthpyear,sd.twelfthper,sd.diplomapyear,sd.diplomaper,sd.tenthpyear,sd.tenthper,sd.backlog];
+  db.query(sql,value,(err,result)=>{
+    if(err) return res.status(400).send(err)
+    else{
+    res.status(201).send("Updated");
+    }
+  })
+})
+
+app.post('/getstudentbranch',(req,res)=>{
+  db.query(`select branch from Student where usn='${req.body.usn}'`,(err,result)=>{
     if(err) return res.status(500).send("err");
     res.status(200).send(result);
   })
@@ -278,8 +353,8 @@ app.post('/addcompany',async (req,res)=>{
     db.query(sql, value,(err,jobResult)=> {
       if (err) {
           db.rollback(function() {
-              console.error('Job insertion failed:', err);
-              res.status(500).send("Error while adding company");
+              // console.error('Job insertion failed:', err);
+              res.status(500).send(err);
           });
           return;
       }
@@ -289,14 +364,14 @@ app.post('/addcompany',async (req,res)=>{
       db.query(sql2, value2, function(err) {
         if (err) {
             db.rollback(function() {
-                console.error('Branch insertion failed:', err);
+                // console.error('Branch insertion failed:', err);
                 res.status(500).send("Error while adding branches");
             });
         } else {
             db.commit(function(err) {
                 if (err) {
                     db.rollback(function() {
-                        console.error('Transaction commit failed:', err);
+                        // console.error('Transaction commit failed:', err);
                         res.status(500).send("Error committing transaction");
                     });
                 } else {
@@ -310,6 +385,99 @@ app.post('/addcompany',async (req,res)=>{
 
 })
 
+app.post('/editcompany',(req,res)=>{
+  const {companydata,branches,arrivaldate,lastdate} = req.body;
+  // console.log(companydata);
+  // console.log(branches);
+  // console.log(arrivaldate);
+  // console.log(lastdate);
+  const sql = `UPDATE Job SET cname=(?),email=(?),type=(?),role=(?),jd=(?),location=(?),fulltimectc=(?),internship=(?),stipendpm=(?),durationinm=(?),backlogs=(?),becutoff=(?),twelfthcutoff=(?),diplomacutoff=(?),tenthcutoff=(?),info=(?),status=(?),arrivaldate=(?),lastdate=(?) WHERE jid=${companydata.jid}`;
+  const value = [companydata.cname,companydata.email,companydata.type,companydata.role,companydata.jd,companydata.location,companydata.fulltimectc,companydata.internship,companydata.stipendpm,companydata.durationinm,companydata.backlogs,companydata.becutoff,companydata.twelfthcutoff,companydata.diplomacutoff,companydata.tenthcutoff,companydata.info,companydata.status,arrivaldate,lastdate];
+  const sql2 = `UPDATE Branch SET AIML=(?),CSE=(?),ISE=(?),ECE=(?),EEE=(?),ME=(?),CV=(?) WHERE jid=${companydata.jid}`;
+  const value2 = [branches.AIML,branches.CSE,branches.ISE,branches.ECE,branches.EEE,branches.ME,branches.CV];
+   
+  db.beginTransaction((err) => {
+    if(err) return res.status(500).send("bT failed");
+    db.query(sql,value,(err,jobResult)=> {
+      if (err) {
+          db.rollback(function() {
+              console.log('Job update failed:', err);
+              res.status(500).send("Error while updating company");
+          });
+          return;
+      }
+      db.query(sql2, value2, function(err) {
+        if (err) {
+            db.rollback(function() {
+                console.log('Branch update failed:', err);
+                res.status(500).send("Error while updating branches");
+            });
+        } else {
+            db.commit(function(err) {
+                if (err) {
+                    db.rollback(function() {
+                        console.log('Transaction commit failed:', err);
+                        res.status(500).send("Error committing transaction");
+                    });
+                } else {
+                    res.status(201).send("Company and branches added successfully");
+                }
+            });
+        }
+    });
+  })
+})
+})
+
+app.post('/removecompany',(req,res)=>{
+  const {jid} = req.body;
+  const sql = `DELETE FROM Branch where jid=${jid}`
+  const sql2 = `DELETE FROM Job where jid=${jid}`
+
+  db.beginTransaction((err) => {
+    if(err) return res.status(500).send("BT failed");
+    db.query(sql,(err)=> {
+      if (err) {
+          db.rollback(function() {
+              console.log('Branch deletion failed:', err);
+              res.status(500).send("Error while deleting company");
+          });
+          return;
+      }
+      db.query(sql2,function(err) {
+        if (err) {
+            db.rollback(function() {
+                console.log('Company deletion failed:', err);
+                res.status(500).send("Error while deleting company");
+            });
+        } else {
+            db.commit(function(err) {
+                if (err) {
+                    db.rollback(function() {
+                        console.log('Transaction commit failed:', err);
+                        res.status(500).send("Error committing transaction");
+                    });
+                } else {
+                    res.status(201).send("Company and branches deleted successfully");
+                }
+            });
+        }
+    });
+  })
+})
+})
+
+
+app.post('/removecompany',async (req,res)=>{
+  const {jid} = req.body;
+  // console.log(companydata);
+  // console.log(branches);
+  // console.log(arrivaldate);
+  // console.log(lastdate);
+  // res.status(200).send(companydata);
+  res.status(401).send("Failed to Remove");
+})
+
 app.post('/getjobidandname',(req,res)=>{
   db.query(`SELECT jid,cname FROM Job`,(err,result)=>{
     if(err) return res.status(500).send("err");
@@ -319,10 +487,243 @@ app.post('/getjobidandname',(req,res)=>{
 
 app.post('/getcompanydetails',(req,res)=>{
   // console.log(req.body);
-  db.query(`SELECT * FROM Job where jid=${req.body.cid}`,(err,result)=>{
+  db.query(`SELECT jid,cname,email,type,role,jd,location,fulltimectc,backlogs,becutoff,twelfthcutoff,diplomacutoff,tenthcutoff,internship,stipendpm,durationinm,info,status,arrivaldate,lastdate FROM Job where jid=${req.body.jid}`,(err,result)=>{
     if(err) return res.status(500).send("err");
-    console.log(result);
+      db.query(`SELECT AIML,CSE,ISE,ECE,EEE,ME,CV FROM Branch where jid = ${req.body.jid}`,(err2,result2)=>{
+        if(err2) return res.status(500).send("err");
+          res.status(200).send({companydetails : result,branchdetails: result2});
+      })
+  })
+})
+
+app.post('/showcompany',(req,res)=>{
+  db.query(`SELECT jid,cname,role,arrivaldate,lastdate FROM Job`,(err,result)=>{
+    if(err) return res.status(500).send("err");
     res.status(200).send(result);
+  })
+})
+
+app.post("/changecpassword",(req,res)=>{
+  const {jid} = req.body;
+  const hashed = bcrypt.hashSync(req.body.cpassword, 10);
+  sql = `UPDATE Job SET password='${hashed}' WHERE jid=${jid}`;
+  db.query(sql,(err,result)=>{
+    if(err){
+      // console.log(err);
+     return res.status(500).send("Failed to update");
+    }  
+    res.status(200).send("Updated Successfully");
+  })
+})
+
+//student
+
+app.post('/getappliablelist',(req,res)=>{
+  const {usn,sbranch} = req.body;
+  const sql = `SELECT Job.jid,cname,type,role,fulltimectc,arrivaldate,lastdate,CASE WHEN Job.jid IN(SELECT Applied.jid FROM Applied where usn='${usn}') THEN 'applied' ELSE 'not applied' end as astatus from Job join Branch on Job.jid = Branch.jid where Job.arrivaldate<=now() and Job.lastdate>=now() and Branch.${sbranch}=true ORDER BY Job.arrivaldate`;
+  db.query(sql,(err,result)=>{
+    if(err){
+      // console.log(err);
+      return res.status(500).send(err);
+    }
+    res.status(200).send(result);
+  })
+})
+
+app.post('/getupcomminglist',(req,res)=>{
+  const {branch} = req.body;
+  db.query(`SELECT Job.jid,cname,type,role,arrivaldate from Job join Branch on Job.jid=Branch.jid where Branch.${branch}=true and Job.arrivaldate>now() and Job.lastdate>now() order by Job.arrivaldate`,(err,result)=>{
+    if(err){
+      console.log(err);
+      return res.status(500).send(err);
+    }
+    res.status(200).send(result);
+  })
+})
+
+app.post('/getpastlist',(req,res)=>{
+  const {branch} = req.body;
+  db.query(`SELECT Job.jid,cname,type,role,lastdate from Job join Branch on Job.jid=Branch.jid where Branch.${branch}=true and Job.lastdate<now() and Job.arrivaldate<now() order by Job.lastdate desc`,(err,result)=>{
+    if(err){
+      console.log(err);
+      return res.status(500).send(err);
+    }
+    res.status(200).send(result);
+  })
+})
+
+app.post('/getappliedlist',(req,res)=>{
+  const {usn,sbranch} = req.body;
+  db.query(`SELECT * FROM Job JOIN Applied on Job.jid=Applied.jid where Applied.usn='${usn}' order by appliedat`,(err,result)=>{
+    if(err){
+      // console.log(err);
+      return res.status(500).send(err);
+    }
+    res.status(200).send(result);
+  })
+})
+
+app.post('/getplaceddetails',(req,res)=>{
+  const {usn} = req.body;
+  const sql = `select Job.jid,cname,type,role,fulltimectc from Placed JOIN Job on Placed.jid=Job.jid where usn='${usn}'`;
+  db.query(sql,(err,result)=>{
+    if(err){
+      // console.log(err);
+      return res.status(500).send("err");
+    }
+    res.status(200).send(result);
+  })
+})
+
+app.post('/updatestudentpassword',(req,res)=>{
+  const {usn,op,np} = req.body;
+  sql = `SELECT cpassword from Student where usn='${usn}'`;
+  db.query(sql,(err,result)=>{
+    if(err) return res.status(501).send("Failed to check password");
+    if(bcrypt.compareSync(op,result[0].cpassword)){
+      const hashed = bcrypt.hashSync(np, 10);
+      db.query(`UPDATE Student set cpassword='${hashed}' where usn='${usn}'`,(err2,result2)=>{
+        if(err2) return res.status(502).send("Failed to update");
+        return res.status(200).send("Password changed")
+      })
+    }
+    else{
+      return res.status(401).send("Wrong password")
+    }
+  })
+
+
+})
+
+app.post('/getresumelink',(req,res)=>{
+  const {usn} = req.body;
+  const sql = `SELECT resume from Student where usn='${usn}'`;
+  db.query(sql,(err,result)=>{
+    if(err) return res.status(500).send("Filed to get resume");
+    return res.status(200).send(result);
+  })
+})
+
+app.post('/updateresumelink',(req,res)=>{
+  const {usn,resume} = req.body;
+  const sql = `UPDATE Student set resume='${resume}' where usn='${usn}'`;
+  db.query(sql,(err,result)=>{
+    if(err) return res.status(500).send("Filed to update resume");
+    return res.status(200).send(result);
+  })
+})
+
+app.post('/applyforjob',(req,res)=>{
+  const {jid,usn} = req.body;
+  const sql = `INSERT INTO Applied(usn,jid,appliedat) values('${usn}',${jid},NOW())`;
+  db.query(sql,(err,result)=>{
+    if(err) return res.status(500).send("Error while applying for job");
+    res.status(200).send('Applied');
+  })
+})
+
+app.post('/geteditcontrols',(req,res)=>{
+  const sql = `SELECT value FROM Controls WHERE type = 'studentprofileedit'`;
+  db.query(sql,(err,result)=>{
+    if(err) return res.status(500).send("Error while getting controls");
+    res.status(200).send(result);
+  })
+})
+
+app.post('/updatecontrols',(req,res)=>{
+  const {value}=req.body
+  const sql = `update Controls set value=${value} WHERE type = 'studentprofileedit'`;
+  db.query(sql,(err,result)=>{
+    if(err) return res.status(500).send("Error while updating controls");
+    res.status(200).send("Controls updated");
+  })
+})
+
+app.post('/getstudentforjid',(req,res)=>{
+  const {jid} = req.body
+  // should exclude password column
+  const sql = `SELECT * FROM Student JOIN Applied on Student.usn = Applied.usn WHERE Applied.jid = '${jid}'`;
+  db.query(sql,(err,result)=>{
+    if(err) return res.status(500).send("Error while getting details");
+    res.status(200).send(result);
+  })
+})
+
+app.post('/addplacedstudent',(req,res)=>{
+  const {usn,jid} = req.body
+  const sql = `INSERT INTO Placed (usn,jid,placedon) values ('${usn}','${jid}',NOW())`;
+  db.query(sql,(err,result)=>{
+    if(err) return res.status(500).send(err);
+    res.status(200).send(result);
+  })
+})
+
+app.post('/getplacedstudents',(req,res)=>{
+  // should exclude password column
+  const sql = `SELECT * FROM Placed Join Student on Placed.usn=Student.usn JOIN Job on Placed.jid=Job.jid`;
+  db.query(sql,(err,result)=>{
+    if(err) return res.status(500).send(err);
+    res.status(200).send(result);
+  })
+})
+
+app.post('/removeplacedstudent',(req,res)=>{
+  const {usn} = req.body;
+  const sql = `DELETE FROM Placed where usn='${usn}'`;
+  db.query(sql,(err,result)=>{
+    if(err) return res.status(500).send("err");
+    res.status(200).send(result);
+  })
+})
+
+app.post('/updatefeedback',(req,res)=>{
+  const {usn,feedback} = req.body;
+  const sql = `UPDATE Placed set feedback='${feedback}' where usn='${usn}'`;
+  db.query(sql,(err,result)=>{
+    if(err) return res.status(500).send("err");
+    res.status(200).send(result);
+  })
+})
+
+app.post('/getfeedback',(req,res)=>{
+  // should exclude password column
+  const sql = `SELECT * FROM Placed JOIN Student on Placed.usn = Student.usn JOIN Job on Placed.jid = Job.jid where Placed.feedback!="" or Placed.feedback!=null`;
+  db.query(sql,(err,result)=>{
+    if(err) return res.status(400).send("Error while getting details");
+    return res.status(200).send(result);
+  })
+})
+
+app.post('/studentspercompany',(req,res)=>{
+  const {jid} = req.body;
+  // should exclude password column
+  const sql = `SELECT *,Student.email as semail FROM Applied JOIN Student on Applied.usn = Student.usn JOIN Job on Applied.jid = Job.jid WHERE Applied.jid = '${jid}'`;
+  db.query(sql,(err,result)=>{
+    if(err) return res.status(400).send("Error while getting details");
+    return res.status(200).send(result);
+  })
+})
+
+app.post('/getanalysis',(req,res)=>{
+  const sql = `
+  SELECT 
+    (SELECT count(Student.usn) FROM Student) as studentcount, 
+    (SELECT count(Placed.usn) FROM Placed) as placedcount,
+    (SELECT count(Job.jid) FROM Job) as jobcount,
+    (SELECT max(Job.fulltimectc) FROM Placed join Job on Placed.jid=Job.jid) as maxctc,
+    (SELECT avg(Job.fulltimectc) FROM Placed join Job on Placed.jid=Job.jid) as avgctc
+  `;
+  db.query(sql,(err,result)=>{
+    if(err) return res.status(400).send(err);
+    const sql2 = `SELECT type,count(Job.type) as typecount FROM Job group by Job.type`;
+    db.query(sql2,(err2,result2)=>{
+      if(err2) return res.status(400).send(err2);
+      const sql3 = `SELECT Student.branch,max(Job.fulltimectc) as max,avg(Job.fulltimectc) as avg from Placed join Job on Placed.jid=Job.jid join Student on Placed.usn=Student.usn GROUP BY branch ORDER BY Student.branch`;
+      db.query(sql3,(err3,result3)=>{
+        if(err3) return res.status(400).send(err3);
+        return res.status(200).send({sql1:result,sql2:result2,sql3:result3});
+      })
+    })
   })
 })
 

@@ -5,6 +5,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import { Box } from '@mui/material';
 import TextField from '@mui/material/TextField';
 import Alert from '@mui/material/Alert';
+import { address } from '../Address';
 
 function Adminprofile({user,handleLogout}) {
     // console.log(user);
@@ -29,7 +30,7 @@ function Adminprofile({user,handleLogout}) {
     useEffect(()=>{
         const removeadmin = async ()=>{
           try {
-            const response = await axios.post('http://localhost:5000/admingetedit',{"email" : `${user.adminemail}`});
+            const response = await axios.post(address+'/admingetedit',{"email" : `${user.adminemail}`});
             setAdmindata(response.data[0]);
             // console.log(response.data[0]);
           } catch (error) {
@@ -103,7 +104,7 @@ function Adminprofile({user,handleLogout}) {
       else{
         if(window.confirm("Confirm Changing E-mail")){
           try {
-            const response = await axios.post('http://localhost:5000/adminemailedit',{oldemail:`${user.adminemail}`,email:`${admindata.email}`});
+            const response = await axios.post(address+'/adminemailedit',{oldemail:`${user.adminemail}`,email:`${admindata.email}`});
             if(response.data.affectedRows > 0){
               // window.alert("Log out...")
               handleLogout();
@@ -123,7 +124,7 @@ function Adminprofile({user,handleLogout}) {
         // console.log(user.adminemail);
         // console.log(admindata.phno);
         try {
-          const response = await axios.post('http://localhost:5000/adminprofileedit',{email :`${user.adminemail}`,name : `${admindata.name}`,phno : `${admindata.phno}`});
+          const response = await axios.post(address+'/adminprofileedit',{email :`${user.adminemail}`,name : `${admindata.name}`,phno : `${admindata.phno}`});
           if(response.data.affectedRows > 0){
             setAlert({
               show : true,
@@ -159,7 +160,7 @@ function Adminprofile({user,handleLogout}) {
     e.preventDefault();
     if(!!!errors.cpassword){
       try {
-        const response = await axios.post('http://localhost:5000/adminpasswordedit',{email:`${user.adminemail}`,oldpassword:`${passwords.oldpassword}`,cpassword:`${passwords.cpassword}`});
+        const response = await axios.post(address+'/adminpasswordedit',{email:`${user.adminemail}`,oldpassword:`${passwords.oldpassword}`,cpassword:`${passwords.cpassword}`});
         window.alert(response.data);
         handleLogout();
       } catch (error) {

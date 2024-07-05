@@ -13,6 +13,7 @@ import bgimage from "./campus.png"
 import adminlogo from "./adminlogo.png"
 import axios from 'axios';
 import {Link,useNavigate } from 'react-router-dom';
+import { address } from '../Address';
 
 function Adminlogin() {
 
@@ -51,9 +52,8 @@ function Adminlogin() {
     }
     if(ltype==='1'){
       // console.log(logindata);
-
     try {
-      const response = await axios.post('http://localhost:5000/adminlogin', logindata, { withCredentials: true });
+      const response = await axios.post(address+'/adminlogin', logindata, { withCredentials: true });
       // alert(response.data.message);
       if(response.data.message === "Login successful"){
       navigate('/admin');
@@ -72,7 +72,24 @@ function Adminlogin() {
     }
     }
     else if(ltype==='2'){
-      // console.log("logindata");
+      // console.log(logindata);
+      try {
+        const response = await axios.post(address+'/companylogin', logindata, { withCredentials: true });
+        // alert(response.data.message);
+        if(response.data.message === "Login successful"){
+        navigate('/company')
+        }
+      } catch (error) {
+        // console.log(error.response.data);
+        if(error.response.data === "Email not found"){
+          setErrors({...errors, email : error.response.data})
+        }
+        if(error.response.data === "Incorrect password"){
+          setErrors({...errors, password : error.response.data})
+        }
+        // console.error(error);
+        // alert('Login failed');
+      }
     }
   }
   return (
@@ -103,12 +120,12 @@ function Adminlogin() {
                             labelId="ltype-select"
                             value={ltype}
                             name="ltype"
-                            onChange={(e) => { setLtype(e.target.value) }}
+                            onChange={(e) => { setLtype(e.target.value);setErrors({email : "",password : "",}); }}
                             // label="Brannch"
                             required
                           >
                             <MenuItem value={"1"}>Admin</MenuItem>
-                            {/* <MenuItem value={"2"}>Company</MenuItem> */}
+                            <MenuItem value={"2"}>Company</MenuItem>
                           </Select>
                         </FormControl>
                       </div>

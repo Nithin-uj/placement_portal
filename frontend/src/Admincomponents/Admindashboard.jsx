@@ -9,8 +9,10 @@ import ListItemButton from '@mui/material/ListItemButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import Adminprofile from './Adminprofile';
 import Adminlist from './Adminlist';
-import Studetntlist from './Studetntlist';
+import Studentlist from './Studentlist';
 import Companylist from './Companylist';
+import Placedstudents from './Placedstudents';
+import Adminhome from './Adminhome';
 
 export default function Admindashboard({user,handleLogout}) {
     const [open, setOpen] = React.useState(false);
@@ -27,11 +29,13 @@ export default function Admindashboard({user,handleLogout}) {
   const Optionrender = ()=>{
     switch(option){
       case 1:
-        return <div>Home</div>;
+        return <Adminhome/>;
       case 2:
-        return <Studetntlist/>;
+        return <Studentlist/>;
       case 3:
         return <Companylist/>;
+      case 4:
+        return <Placedstudents/>;
       case 11:
         return <Adminlist user={user}/>;
       case 12:
@@ -61,6 +65,11 @@ export default function Admindashboard({user,handleLogout}) {
       <List disablePadding>
           <ListItem disablePadding className={`${option === 3 && 'text-light bg-primary'}`}>
             <ListItemButton onClick={()=>{setOption(3)}}>Company</ListItemButton>
+          </ListItem>
+      </List>
+      <List disablePadding>
+          <ListItem disablePadding className={`${option === 4 && 'text-light bg-primary'}`}>
+            <ListItemButton onClick={()=>{setOption(4)}}>Placed students</ListItemButton>
           </ListItem>
       </List>
       <Divider />
