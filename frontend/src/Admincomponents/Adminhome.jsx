@@ -11,7 +11,7 @@ function Adminhome() {
       try {
         const response = await axios.post(address+'/getanalysis');
         if(response.status === 200){
-          console.log(response.data)
+          // console.log(response.data)
           setDetails(response.data)
         }
       } catch (error) {

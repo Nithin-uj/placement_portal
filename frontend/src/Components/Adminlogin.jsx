@@ -125,7 +125,7 @@ function Adminlogin() {
                             required
                           >
                             <MenuItem value={"1"}>Admin</MenuItem>
-                            <MenuItem value={"2"}>Company</MenuItem>
+                            {/* <MenuItem value={"2"}>Company</MenuItem> */}
                           </Select>
                         </FormControl>
                       </div>

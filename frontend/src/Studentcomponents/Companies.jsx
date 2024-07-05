@@ -78,7 +78,7 @@ const Accordation = ({usn})=>{
             }
         }
         getdetails();
-    },[])
+    },[usn])
 
     if(!!!branch){
         return <>Loading...</>
@@ -159,6 +159,8 @@ const Appliablelist = ({branch,usn})=>{
     const [companiesdetails,setCompaniesdetails] = useState("");
     const [studentdetails,setStudentdetails] = useState("");
     const [viewcompany,setViewcompany] = useState("");
+    const [toogle,setToogle] = useState(false);
+
     const getdetails = async ()=>{
         try{
             const response = await axios.post(address+"/getappliablelist",{sbranch:branch,usn:usn});
@@ -174,8 +176,21 @@ const Appliablelist = ({branch,usn})=>{
     }
 
     useEffect(()=>{
-        getdetails();
-    },[])
+      const getinitdetails = async ()=>{
+        try{
+            const response = await axios.post(address+"/getappliablelist",{sbranch:branch,usn:usn});
+            const response2 = await axios.post(address+"/getstudentdetails",{usn:usn});
+            // console.log(response.data);
+            setCompaniesdetails(response.data);
+            setStudentdetails(response2.data[0]);
+        }
+        catch(error){
+            console.log("Error while getting details");
+            console.log(error)
+        }
+    }
+        getinitdetails();
+    },[branch,usn])
 
     const applyforcompany = (jid)=>{
         // console.log(jid);
@@ -184,6 +199,7 @@ const Appliablelist = ({branch,usn})=>{
             const response = await axios.post(address+'/applyforjob',{jid:jid,usn:usn});
             // console.log(response.data);
             if(response.data === 'Applied'){
+              setToogle(!toogle);
               getdetails();
             }
           }

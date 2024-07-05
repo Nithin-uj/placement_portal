@@ -3,7 +3,6 @@ import Viewappliedcompanies from "./Viewappliedcompanies"
 import Box from '@mui/material/Box';
 import { address } from "../Address";
 import axios from "axios";
-import Companies from "./Companies";
 import { Alert, TextField } from "@mui/material";
 import {Button} from "@mui/material";
 
@@ -27,7 +26,7 @@ export default function CurrentStatus ({usn}){
             }
         }
         getplaceddeetails();
-    },[])
+    },[usn])
 
     const Feedback = ()=>{
         const [newfeedback,setNewfeedback] = useState("");

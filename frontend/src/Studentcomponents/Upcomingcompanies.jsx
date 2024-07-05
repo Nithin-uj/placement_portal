@@ -11,7 +11,7 @@ export default function Upcomingcompanies({branch}) {
             setCompaniesdetails(response.data);
         }
         getdetails();
-    },[])
+    },[branch])
     const objecttostring = (oldutcdate) => {
         const date = new Date(oldutcdate);
     
