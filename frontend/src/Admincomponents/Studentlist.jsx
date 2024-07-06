@@ -226,7 +226,7 @@ const Viewstudent = ()=>{
           // const year = date.getUTCFullYear();
           // const month = String(date.getUTCMonth() + 1).padStart(2, '0'); // Months are zero-based
           // const day = String(date.getUTCDate()).padStart(2, '0');
-          setStudentdob(String(date.getUTCDate()+1).padStart(2, '0')+"-"+String(date.getUTCMonth()+1).padStart(2, '0')+"-"+date.getUTCFullYear())
+          setStudentdob(String(date.getUTCDate()).padStart(2, '0')+"-"+String(date.getUTCMonth()+1).padStart(2, '0')+"-"+date.getUTCFullYear())
         } catch (error) {
           // console.log(error);
           console.log(error.response.data);
@@ -388,7 +388,7 @@ const Studenttable = ()=>{
     const convertdate = (olddate) => {
       const date = new Date(olddate);
       // console.log(olddate);
-      const newdate = String(date.getUTCDate()+1).padStart(2, '0')+"-"+String(date.getUTCMonth()+1).padStart(2, '0')+"-"+date.getUTCFullYear();
+      const newdate = String(date.getUTCDate()).padStart(2, '0')+"-"+String(date.getUTCMonth()+1).padStart(2, '0')+"-"+date.getUTCFullYear();
       // console.log(newdate);
       return newdate;
     };

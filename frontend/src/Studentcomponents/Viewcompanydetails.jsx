@@ -3,6 +3,7 @@ import { useEffect,useState } from 'react';
 import { address } from '../Address';
 import axios from 'axios';
 import { Checkbox } from '@mui/material';
+import {Box,CircularProgress} from '@mui/material';
 
 function Viewcompanydetails({jid}) {
     const [details, setDetails] = useState(null);
@@ -38,7 +39,9 @@ function Viewcompanydetails({jid}) {
         getdetails();
       },[]);
       if(details === null || branchdetails === null){
-        return <>Loading...</>
+        return <><Box sx={{ display: 'flex',height:"100%" }} className="align-items-center justify-content-center">
+        <CircularProgress className='m-5'/>
+        </Box></>
       }
   return (
     <div>
