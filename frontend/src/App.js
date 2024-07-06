@@ -10,6 +10,7 @@ import Admin from './Admincomponents/Admin.jsx';
 import Main from './Components/Main';
 import Student from './Studentcomponents/Student.jsx'
 import Company from './Companycomponents/Company.jsx';
+import Notfound from './Notfound.jsx'
 import './custom.scss'; 
 function App() {
 
@@ -24,6 +25,7 @@ function App() {
         <Route path="/admin" element={<Admin/>}></Route>
         <Route path="/company" element={<Company/>}></Route>
         <Route path="/main" element={<Main/>}></Route>
+        <Route path="*" element={<Notfound/>}></Route>
       </Routes>
     </BrowserRouter>
   );

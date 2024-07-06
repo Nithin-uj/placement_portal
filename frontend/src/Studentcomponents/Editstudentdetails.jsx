@@ -34,7 +34,7 @@ export default function Editstudentdetails({usn}) {
         const date = new Date(olddate);
         // console.log(olddate);
         // const newdate = String(date.getUTCDate()+1).padStart(2, '0')+"-"+String(date.getUTCMonth()+1).padStart(2, '0')+"-"+date.getUTCFullYear();
-        const newdate = date.getUTCFullYear()+"-"+String(date.getUTCMonth()+1).padStart(2, '0')+"-"+String(date.getUTCDate()+1).padStart(2, '0');
+        const newdate = date.getUTCFullYear()+"-"+String(date.getUTCMonth()+1).padStart(2, '0')+"-"+String(date.getUTCDate()).padStart(2, '0');
         // console.log(newdate);
         return newdate;
       };
