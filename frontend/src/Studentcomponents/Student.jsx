@@ -5,6 +5,7 @@ import Studentdashboard from './Studentdashboard';
 import Header from '../Components/Header';
 import Footer from '../Components/Footer';
 import { address } from '../Address';
+import { Box,CircularProgress } from '@mui/material';
 
 function Profile() {
   const [user, setUser] = useState(null);
@@ -33,7 +34,9 @@ function Profile() {
     }
   };
 
-  if (!user) return <div>Loading...</div>;
+  if (!user) return <div><Box sx={{ display: 'flex',height:"100%" }} className="align-items-center justify-content-center">
+  <CircularProgress className='m-5'/>
+  </Box></div>;
 
   return (
     // <div>

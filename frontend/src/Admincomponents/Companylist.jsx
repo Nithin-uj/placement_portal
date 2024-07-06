@@ -412,7 +412,7 @@ const Addcompany = () => {
     // console.log(lastdate);
     // console.table(branches);
     try {
-      const response = await axios.post("http://localhost:5000/addcompany", {
+      const response = await axios.post(address+"/addcompany", {
         companydata: companydata,
         branches: branches,
         arrivaldate: objecttodate(new Date(arrivaldate)),
@@ -1453,7 +1453,7 @@ const Passwordchange = ({ jid, cname }) => {
       // console.log(jid)
       // console.log(cpassword)
       try{
-        const response = await axios.post("http://localhost:5000/changecpassword",{jid:jid,cpassword:cpassword});
+        const response = await axios.post(address+"/changecpassword",{jid:jid,cpassword:cpassword});
         // console.log("Password reseted");
         // console.log(response.data);
         if(response.status===200){
