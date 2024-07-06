@@ -512,7 +512,7 @@ app.post("/sample",(req,res)=>{
 
 app.post('/getappliablelist',(req,res)=>{
   const {usn,sbranch} = req.body;
-  const sql = `SELECT Job.jid,cname,type,role,fulltimectc,arrivaldate,lastdate,CASE WHEN Job.jid IN(SELECT Applied.jid FROM Applied where usn='${usn}') THEN 'applied' ELSE 'not applied' end as astatus from Job join Branch on Job.jid = Branch.jid where Job.arrivaldate<=now() and Job.lastdate>=now() and Branch.${sbranch}=true ORDER BY Job.arrivaldate`;
+  const sql = `SELECT Job.jid,cname,type,role,fulltimectc,arrivaldate,becutoff,diplomacutoff,twelfthcutoff,tenthcutoff,lastdate,CASE WHEN Job.jid IN(SELECT Applied.jid FROM Applied where usn='${usn}') THEN 'applied' ELSE 'not applied' end as astatus from Job join Branch on Job.jid = Branch.jid where Job.arrivaldate<=now() and Job.lastdate>=now() and Branch.${sbranch}=true ORDER BY Job.arrivaldate`;
   db.query(sql,(err,result)=>{
     if(err){
       // console.log(err);
