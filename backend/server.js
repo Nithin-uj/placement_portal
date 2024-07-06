@@ -11,7 +11,7 @@ const port = 5000;
 
 app.use(bodyParser.json());
 app.use(cors({
-	origin: ['http://localhost:3000','http://192.168.203.194:3000','http://edugiri.cloud'],
+	origin: ['http://localhost:3000','http://192.168.203.194:3000','http://edugiri.cloud','http://placement.edugiri.cloud'],
   credentials: true
 }));
 
