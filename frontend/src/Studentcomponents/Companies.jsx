@@ -6,6 +6,8 @@ import Viewcompanydetails from './Viewcompanydetails';
 import CurrentStatus from './CurrentStatus';
 import Upcomingcompanies from './Upcomingcompanies';
 import Pastcompanies from './Pastcompanies';
+import TableRowsIcon from '@mui/icons-material/TableRows';
+import {Box,CircularProgress} from '@mui/material';
 
 export default function Companies({usn}) {
     // console.log(usn);
@@ -81,7 +83,9 @@ const Accordation = ({usn})=>{
     },[usn])
 
     if(!!!branch){
-        return <>Loading...</>
+        return <Box sx={{ display: 'flex',height:"100%" }} className="align-items-center justify-content-center">
+        <CircularProgress className='m-5'/>
+        </Box>;
     }
 
     return <div className='px-1'>
@@ -225,7 +229,9 @@ const Appliablelist = ({branch,usn})=>{
       };
 
     if(!!!companiesdetails){
-        return <>Loading...</>
+        return <Box sx={{ display: 'flex',height:"100%" }} className="align-items-center justify-content-center">
+        <CircularProgress className='m-5'/>
+        </Box>
     }
 
     if(!!!studentdetails){
@@ -241,7 +247,10 @@ const Appliablelist = ({branch,usn})=>{
 
     return <div>
             <div className="d-flex flex-wrap justify-content-center">
-            {companiesdetails.length<=0 && <div className='m-3'>No data</div>}
+            {companiesdetails.length<=0 && <div className='m-5'>
+          <div className="d-flex justify-content-center"><TableRowsIcon color="disabled" sx={{ fontSize: 40 }}/></div>
+          <div class="text-secondary">No Data</div>
+          </div>}
             {/* {console.table(studentdetails)}
             {console.log(companiesdetails)} */}
             {companiesdetails.map((data) => (

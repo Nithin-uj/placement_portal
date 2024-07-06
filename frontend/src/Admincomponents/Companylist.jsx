@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { ButtonGroup, Button, CircularProgress } from "@mui/material";
+import TableRowsIcon from '@mui/icons-material/TableRows';
 import {
   TextField,
   FormControl,
@@ -418,6 +419,7 @@ const Addcompany = () => {
         lastdate: objecttodate(new Date(lastdate)),
       });
       // console.log(response.data);
+      if(response.status === 201){
       setSalert(true);
       setPassword("");
       setArrivaldate(new Date());
@@ -455,6 +457,7 @@ const Addcompany = () => {
       setTimeout(() => {
         setSalert(false);
       }, 3000);
+      }
     } catch (error) {
       if (error.response.data.code === "ER_DUP_ENTRY") {
         // window.alert("Email already exist");
@@ -1233,8 +1236,12 @@ const Viewcompany = () => {
         const response = await axios.post(
           address+"/getjobidandname"
         );
-        // console.log(response.data);
-        setCnamelist(response.data);
+        if(response.data.length <=0 ){
+          setCnamelist(-1);
+        }
+        else{
+          setCnamelist(response.data);
+        }
       } catch (error) {
         console.log("Error while getting list");
       }
@@ -1245,6 +1252,20 @@ const Viewcompany = () => {
   // console.log(cnamelist);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedOption, setSelectedOption] = useState(null);
+  if (cnamelist === -1) {
+    return (
+      <div
+        className="d-flex justify-content-center align-items-center"
+        style={{ height: "25vh" }}
+      >
+        {/* <CircularProgress></CircularProgress> */}
+        <div>
+        <div className="d-flex justify-content-center"><TableRowsIcon color="disabled" sx={{ fontSize: 40 }}/></div>
+        <div class="text-secondary">No Data</div>
+        </div>
+      </div>
+    );
+  }
   return (
     <>
       {cnamelist.length > 0 ? (
@@ -1296,19 +1317,6 @@ const Viewcompany = () => {
 // };
 
 const Editcompany = ({ jid }) => {
-  
-  const objecttostring = (oldutcdate) => {
-    const date = new Date(oldutcdate);
-    const options = {
-      timeZone: "Asia/Kolkata",
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-    };
-    return date.toLocaleString("en-IN", options).replaceAll("/", "-");
-  };
 
   const [details, setDetails] = useState(null);
   const [branchdetails, setBranchdetails] = useState(null);
@@ -1349,6 +1357,8 @@ const Editcompany = ({ jid }) => {
 
 const Maineditcompany = () => {
   const [cnamelist, setCnamelist] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedOption, setSelectedOption] = useState(null);
 
   useEffect(() => {
     const getlist = async () => {
@@ -1356,8 +1366,12 @@ const Maineditcompany = () => {
         const response = await axios.post(
           address+"/getjobidandname"
         );
-        // console.log(response.data);
-        setCnamelist(response.data);
+        if(response.data.length <= 0){
+          setCnamelist(-1);
+        }
+        else{
+          setCnamelist(response.data);
+        }
       } catch (error) {
         console.log("Error while getting list");
       }
@@ -1365,9 +1379,22 @@ const Maineditcompany = () => {
     getlist();
   }, []);
 
+  if (cnamelist === -1) {
+    return (
+      <div
+        className="d-flex justify-content-center align-items-center"
+        style={{ height: "25vh" }}
+      >
+        {/* <CircularProgress></CircularProgress> */}
+        <div>
+        <div className="d-flex justify-content-center"><TableRowsIcon color="disabled" sx={{ fontSize: 40 }}/></div>
+        <div class="text-secondary">No Data</div>
+        </div>
+      </div>
+    );
+  }
+
   // console.log(cnamelist);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedOption, setSelectedOption] = useState(null);
   return (
     <>
       {cnamelist.length > 0 ? (
@@ -1407,25 +1434,6 @@ const Maineditcompany = () => {
   );
 };
 
-const removecompany = async (jid) => {
-  if (
-    window.confirm(
-      "By Removing the company,\nIt also removes the applied student details\n Are you sure ?"
-    )
-  ) {
-    window.alert("Applied students check");
-    try {
-      const response = await axios.post(address+"/removecompany", {
-        jid: jid,
-      });
-      // console.log(jid);
-      console.log(response.data);
-    } catch (error) {
-      window.alert("Failed to remove");
-    }
-  }
-};
-
 const Passwordchange = ({ jid, cname }) => {
   const [password, setPassword] = useState("");
   const [cpassword, setCpassword] = useState("");
@@ -1448,7 +1456,9 @@ const Passwordchange = ({ jid, cname }) => {
         const response = await axios.post("http://localhost:5000/changecpassword",{jid:jid,cpassword:cpassword});
         // console.log("Password reseted");
         // console.log(response.data);
-        setSalert(true);
+        if(response.status===200){
+          setSalert(true);
+        }
       }
       catch(error){
         if(error){
@@ -1537,19 +1547,59 @@ const Showcompany = () => {
     };
 
     const [showcompanylist, setShowcompanylist] = useState([]);
-    useEffect(() => {
-      const getlist = async () => {
-        try {
-          const response = await axios.post(
-            address+"/showcompany"
-          );
-          setShowcompanylist(response.data);
-        } catch (error) {
-          console.log("Error");
+
+    const getlist = async () => {
+      try {
+        const response = await axios.post(
+          address+"/showcompany"
+        );
+        if(response.data.length <= 0){
+          setShowcompanylist(-1);
         }
-      };
+        else{
+          setShowcompanylist(response.data);
+        }
+      } catch (error) {
+        console.log("Error");
+      }
+    };
+
+    useEffect(() => {
       getlist();
     }, []);
+
+    const removecompany = async (jid) => {
+      if (
+        window.confirm(
+          "Are you sure to remove company"
+        )
+      ){
+        try {
+          const response = await axios.post(address+"/removecompany", {
+            jid: jid,
+          });
+          getlist();
+          console.log(response.data);
+        } catch (error) {
+          window.alert("Failed to remove students are 'Applied ' or 'Placed'\nClose the application by changing the last date");
+        }
+      }
+    };
+
+    if (showcompanylist === -1) {
+      return (
+        <div
+          className="d-flex justify-content-center align-items-center"
+          style={{ height: "25vh" }}
+        >
+          {/* <CircularProgress></CircularProgress> */}
+          <div>
+          <div className="d-flex justify-content-center"><TableRowsIcon color="disabled" sx={{ fontSize: 40 }}/></div>
+          <div class="text-secondary">No Data</div>
+          </div>
+        </div>
+      );
+    }
 
     if (showcompanylist.length <= 0) {
       return (
@@ -1715,6 +1765,7 @@ const Showcompany = () => {
             <Passwordchange jid={passwordchange} cname={passwordchangename} />
           </>
         );
+      default: return <Renderlist />
     }
   };
   return <Render />;

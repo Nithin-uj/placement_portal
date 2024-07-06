@@ -32,16 +32,21 @@ function Adminhome() {
            <div> Numner of students registered : <b>{details.sql1[0].studentcount}</b></div>
            <div> Numner of students placed : <b>{details.sql1[0].placedcount}</b></div>
         </Box>
-        <Box component="section" sx={{ p:2, m:2,width:300 ,border: '1px dashed grey' }}>
+        <Box component="section" sx={{ p:2, m:2,width:350 ,border: '1px dashed grey' }}>
             Number of companies visited : <b>{details.sql1[0].jobcount}</b>
             <hr className='m-1'/>
             <div className="container-fluid m-0 p-0">
+              {details.sql2.length <= 0 ? <></> : 
               <div className="row m-0 p-0">
-                <div className="col-6 p-0">Open dream : <b>{details.sql2.filter(sql2 => sql2.type === 'opendream')[0].typecount}</b></div>
-                <div className="col-6 p-0">Dream : <b>{details.sql2.filter(sql2 => sql2.type === 'dream')[0].typecount}</b></div>
-                <div className="col-6 p-0">Core : <b>{details.sql2.filter(sql2 => sql2.type === 'core')[0].typecount}</b></div>
-                <div className="col-6 p-0">Mass : <b>{details.sql2.filter(sql2 => sql2.type === 'mass')[0].typecount}</b></div>
+                {/* <div className="col-6 p-0">Open dream : <b>{details.sql2.filter(sql2 => sql2.type === 'opendream')[0].typecount}</b></div> */}
+                {/* <div className="col-6 p-0">Dream : <b>{details.sql2.filter(sql2 => sql2.type === 'dream')[0].typecount}</b></div> */}
+                {/* <div className="col-6 p-0">Core : <b>{details.sql2.filter(sql2 => sql2.type === 'core')[0].typecount}</b></div>
+                <div className="col-6 p-0">Mass : <b>{details.sql2.filter(sql2 => sql2.type === 'mass')[0].typecount}</b></div> */}
+                {details.sql2.map((data,index)=>{
+                  return <div className="col-6 p-0">{data.type.toUpperCase() + " : "}<b>{data.typecount}</b></div> 
+                })}
               </div>
+              }
             </div>
         </Box>
     </div>

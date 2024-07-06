@@ -68,8 +68,8 @@ export default function CurrentStatus ({usn}){
     return  <div>
         <div className="m-2">
         {placed ? <><Placedcompany cdetails={cdetails}/><Feedback/></> : 
-        <Box component="section" sx={{ p: 2, border: '1px dashed grey' }}>
-            No data or Not yet placed in any company
+        <Box component="section" sx={{ p:2, border: '1px dashed grey' }}>
+            <div>No data or Not yet placed in any company</div>
         </Box>}
         </div>
         <div className="accordion my-3 mx-2" id="accordionExample">

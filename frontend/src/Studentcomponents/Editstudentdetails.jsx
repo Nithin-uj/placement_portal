@@ -5,7 +5,7 @@ import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
-import { Button, FormControlLabel, FormLabel, Radio, RadioGroup, TextField, CircularProgress} from '@mui/material';
+import { Button, TextField, CircularProgress} from '@mui/material';
 import { Stepper,Step,StepButton } from '@mui/material'
 import Flatpickr from "react-flatpickr";
 
@@ -44,7 +44,7 @@ export default function Editstudentdetails({usn}) {
     }
     const handelchange = (e)=>{
         const {name,value} = e.target;
-        console.log(name+" : "+value);
+        // console.log(name+" : "+value);
         setStudentdetails({...studentdetails,[name]:value});
         if(step === 1){
           if(name === 'email'){

@@ -11,7 +11,7 @@ const port = 5000;
 
 app.use(bodyParser.json());
 app.use(cors({
-	origin: ['http://localhost:3000','http://65.2.132.52:80','http://65.2.132.52:3000'],
+	origin: ['http://localhost:3000','http://192.168.203.194:3000','http://edugiri.cloud'],
   credentials: true
 }));
 
@@ -439,22 +439,22 @@ app.post('/removecompany',(req,res)=>{
     db.query(sql,(err)=> {
       if (err) {
           db.rollback(function() {
-              console.log('Branch deletion failed:', err);
-              res.status(500).send("Error while deleting company");
+              // console.log('Branch deletion failed:', err);
+              res.status(500).send("Error while deleting branch");
           });
           return;
       }
       db.query(sql2,function(err) {
         if (err) {
             db.rollback(function() {
-                console.log('Company deletion failed:', err);
+                // console.log('Company deletion failed:', err);
                 res.status(500).send("Error while deleting company");
             });
         } else {
             db.commit(function(err) {
                 if (err) {
                     db.rollback(function() {
-                        console.log('Transaction commit failed:', err);
+                        // console.log('Transaction commit failed:', err);
                         res.status(500).send("Error committing transaction");
                     });
                 } else {
@@ -465,17 +465,6 @@ app.post('/removecompany',(req,res)=>{
     });
   })
 })
-})
-
-
-app.post('/removecompany',async (req,res)=>{
-  const {jid} = req.body;
-  // console.log(companydata);
-  // console.log(branches);
-  // console.log(arrivaldate);
-  // console.log(lastdate);
-  // res.status(200).send(companydata);
-  res.status(401).send("Failed to Remove");
 })
 
 app.post('/getjobidandname',(req,res)=>{

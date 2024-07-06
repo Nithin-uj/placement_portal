@@ -4,6 +4,7 @@ import { address } from "../Address";
 import axios from 'axios';
 import { Button } from "@mui/material";
 import Viewcompanydetails from "./Viewcompanydetails";
+import {Box,CircularProgress} from "@mui/material";
 
 export default function Viewappliedcompanies({usn}){
     const [companiesdetails,setCompaniesdetails] = useState("");
@@ -48,11 +49,13 @@ export default function Viewappliedcompanies({usn}){
     },[])
 
     if(nodata){
-        return <div className="d-flex justify-content-center m-2">No data or Company may closed application</div>
+        return <div className="d-flex justify-content-center m-3">No data or Company may closed the application</div>
     }
 
     if(!!!companiesdetails){
-        return <>Loading...</>
+        return <Box sx={{ display: 'flex',height:"100%" }} className="align-items-center justify-content-center">
+        <CircularProgress className='m-5'/>
+        </Box>
     }
 
     if(!!viewcompany){

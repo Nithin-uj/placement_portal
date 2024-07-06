@@ -240,15 +240,14 @@ const Viewstudent = ()=>{
       const response = await axios.post(address+"/removestudent",{usn:studentusn});
       if(response.status === 200){
         window.alert("Student removed");
+        setStudentusn("")
+        setStudentdetails(null)
       }
       }
       catch(error){
-        window.alert("Failed to remove student");
-        console.log(error)
+        window.alert("Failed to remove, student is 'Applied' or 'Placed' for a Company");
+        // console.log(error)
       }
-    console.log("removed");
-    setStudentusn("")
-    setStudentdetails(null)
   }
   
   return <div className='d-flex justify-content-center'>

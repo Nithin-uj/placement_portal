@@ -1,5 +1,6 @@
 import axios from 'axios';
 import React, { useEffect,useState } from 'react'
+import TableRowsIcon from '@mui/icons-material/TableRows';
 import { address } from '../Address';
 
 export default function Upcomingcompanies({branch}) {
@@ -34,7 +35,11 @@ export default function Upcomingcompanies({branch}) {
   return (
     <div className='d-flex justify-content-center'>
         <div className='d-flex flex-wrap justify-content-center'>
-        {companiesdetails.length<=0 && <div className='m-3'>No data</div>}
+        {companiesdetails.length<=0 && <div className='m-5'>
+          <div className="d-flex justify-content-center"><TableRowsIcon color="disabled" sx={{ fontSize: 40 }}/></div>
+          <div class="text-secondary">No Data</div>
+          </div>
+        }
         {companiesdetails.map((data) => (
               <div key={data.jid}>
                 <div className="card m-2 shadow" style={{ width: "300px" }}>

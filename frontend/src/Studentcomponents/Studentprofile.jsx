@@ -1,24 +1,42 @@
 import React,{ useState,useEffect } from "react";
 import { address } from "../Address";
 import axios from "axios";
+import { Box,CircularProgress } from "@mui/material";
 
 export default function Studentprofile ({usn}){
     const [studentdetails,setStudentdetails] = useState(null);
+    const objecttostring = (oldutcdate) => {
+        const date = new Date(oldutcdate);
+    
+        const options = {
+          timeZone: "Asia/Kolkata",
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+        //   hour: "2-digit",
+        //   minute: "2-digit",
+        };
+    
+        return date.toLocaleString("en-IN", options).replaceAll("/", "-");
+      };
+
     useEffect(()=>{
         const getstudentdetails = async ()=> {
             try {
               const response = await axios.post(address+'/getstudentdetails',{usn:usn});
-              setStudentdetails(response.data[0])
+                  setStudentdetails(response.data[0])
             //   console.log(response.data[0]);
             } catch (error) {
               console.log("Failed to get data");
             }
           }
           getstudentdetails();
-    },[])
+    },[usn])
 
     if(studentdetails === null){
-        return <>Loading...</>
+        return <Box sx={{ display: 'flex',height:"100%" }} className="align-items-center justify-content-center">
+        <CircularProgress className='m-5'/>
+        </Box>;
     }
     
     return <div className='d-flex container-fluid justify-content-center p-3'>
@@ -46,7 +64,7 @@ export default function Studentprofile ({usn}){
                         </div>
                         <div className="row border-bottom py-1">
                             <b className="col-4">Date of Birth : </b>
-                            <div className="col-8">{studentdetails.dob}</div>
+                            <div className="col-8">{objecttostring(studentdetails.dob)}</div>
                         </div>
                         <div className="row border-bottom py-1">
                             <b className="col-4">Gender : </b>
@@ -128,7 +146,7 @@ export default function Studentprofile ({usn}){
                         </div>
                         <div className="row border-bottom py-1">
                             <b className="col-4">Resume Link: </b>
-                            <a className="col-8" target='_blank' href={studentdetails.resume}>{studentdetails.resume}</a>
+                            <a className="col-8" target='_blank' rel="noreferrer" href={studentdetails.resume}>{studentdetails.resume}</a>
                         </div>
                         </div>
                         </div>

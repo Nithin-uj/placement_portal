@@ -5,6 +5,7 @@ import axios from 'axios'
 import { address } from '../Address'
 import {Alert} from '@mui/material'
 import Customalert from './Customalert'
+import {Box,CircularProgress} from '@mui/material'
 
 function Editstudentprofile({usn,handleLogout}) {
     const [password,setPassword] = useState({
@@ -106,7 +107,9 @@ function Editstudentprofile({usn,handleLogout}) {
     },[])
 
     if(resume === -1){
-        return <>Loading</>;
+        return <Box sx={{ display: 'flex',height:"100%" }} className="align-items-center justify-content-center">
+        <CircularProgress className='m-5'/>
+        </Box>;
     }
 
   return (

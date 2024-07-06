@@ -1,25 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { ButtonGroup, Button, CircularProgress } from "@mui/material";
-import {
-  TextField,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  FormLabel,
-  RadioGroup,
-  FormGroup,
-  Checkbox,
-  FormControlLabel,
-  Radio,
-} from "@mui/material";
-import { Alert } from "@mui/material";
-import Flatpickr from "react-flatpickr";
+import TableRowsIcon from '@mui/icons-material/TableRows';
+import { CircularProgress } from "@mui/material";
 import "flatpickr/dist/themes/material_blue.css";
 import axios from "axios";
 import Studentdropdown from "./Studentdropdown";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import Tempedit from "./Subedit";
 import { address } from "../Address";
 import Subeditstudent from "./Subeditstudent";
 
@@ -31,8 +15,11 @@ const Searchstudent = () => {
           const response = await axios.post(
             address+"/getusnandname"
           );
-        //   console.log(response.data);
-          setStudentlist(response.data);
+          if(response.data.length<=0){
+            setStudentlist(-1);
+          }else{
+            setStudentlist(response.data);
+          }
         } catch (error) {
           console.log("Error while getting list");
         //   console.log(error);
@@ -43,6 +30,20 @@ const Searchstudent = () => {
   
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedOption, setSelectedOption] = useState(null);
+
+    if(studentlist === -1){
+      return <div
+      className="d-flex justify-content-center align-items-center"
+      style={{ height: "25vh" }}
+      >
+      {/* <CircularProgress></CircularProgress> */}
+      <div>
+      <div className="d-flex justify-content-center"><TableRowsIcon color="disabled" sx={{ fontSize: 40 }}/></div>
+      <div class="text-secondary">No Data</div>
+      </div>
+    </div>
+    }
+
     return (
       <>
         {studentlist.length > 0 ? (
